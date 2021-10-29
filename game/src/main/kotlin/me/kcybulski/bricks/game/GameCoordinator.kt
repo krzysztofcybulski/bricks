@@ -4,18 +4,24 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
+import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.MoveTrigger.FirstMove
 import me.kcybulski.bricks.game.MoveTrigger.OpponentMoved
+import java.util.UUID.randomUUID
 
 class GameCoordinator(
     private val algorithms: AlgorithmsPair,
-    private val gameSettings: GameSettings
+    private val gameSettings: GameSettings,
+    private val events: EventBus
 ) {
 
     val players = algorithms.players()
 
-    suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame =
-        initialize(startingPlayer, NewGame(players, mapSize))
+    suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame {
+        val game = NewGame(randomUUID(), players, mapSize)
+        events.send(GameStartedEvent(game.id, players))
+        return initialize(startingPlayer, game)
+    }
 
     private suspend fun next(game: Game, lastMove: MoveTrigger): EndedGame =
         when (game) {
@@ -35,6 +41,7 @@ class GameCoordinator(
 
     private suspend fun currentPlayerMove(game: InProgressGame, lastMove: MoveTrigger) =
         withTimeoutOrNull(gameSettings.moveTime) { algorithms[game.currentPlayer].move(lastMove) }
+            ?.also { events.send(PlayerMovedEvent(game.id, game.currentPlayer, it)) }
             ?.let { next(game.placed(it), OpponentMoved(it)) }
             ?: game.lost()
 
@@ -47,8 +54,9 @@ class GameCoordinator(
 
     private suspend fun init(player: Algorithm, game: NewGame) =
         withTimeoutOrNull(gameSettings.initTime) { player.initialize(game) }
-            ?.let { PlayerInitializedInTime(player.identity) }
+            ?.let { PlayerInitializedInTime(player.identity)
+                .also { events.send(PlayerInitializedEvent(game.id, player.identity))} }
             ?: PlayerExceededInitTimeout(player.identity)
+                .also { events.send(PlayerNotInitializedInTimeEvent(game.id, player.identity))}
 
 }
-

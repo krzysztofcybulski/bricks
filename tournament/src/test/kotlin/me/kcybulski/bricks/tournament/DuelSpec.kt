@@ -2,6 +2,7 @@ package me.kcybulski.bricks.tournament
 
 import io.kotest.core.spec.IsolationMode.InstancePerTest
 import io.kotest.core.spec.style.ShouldSpec
+import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.GameCoordinator
 import me.kcybulski.bricks.game.GameSettings
 import me.kcybulski.bricks.game.vs
@@ -18,10 +19,11 @@ class DuelSpec : ShouldSpec({
 
     val coordinator = GameCoordinator(
         archer vs ciril,
-        GameSettings(initTime = 10, moveTime = 10)
+        GameSettings(initTime = 10, moveTime = 10),
+        EventBus()
     )
 
-    val duel = DuelCoordinator(coordinator)
+    val duel = DuelCoordinator(coordinator, EventBus())
 
     should("play take turns when playing duel") {
         //given

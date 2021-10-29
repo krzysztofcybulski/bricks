@@ -30,7 +30,7 @@ internal class Tournament(
     }
 
     private suspend fun playDuel(duel: PlayersPair): DuelResult =
-        GameCoordinator(duel.algorithmsPair(algorithms), settings.game)
+        GameCoordinator(duel.algorithmsPair(algorithms), settings.game, events)
             .let { DuelCoordinator(it, events) }
             .duel(*settings.mapSizesPerDuel.toIntArray())
 

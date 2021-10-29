@@ -12,26 +12,19 @@ sealed class Brick(val blocks: List<Block>)
 class DuoBrick private constructor(blocks: List<Block>) : Brick(blocks) {
 
     companion object {
-        fun of(vararg blocks: Block): Either<InvalidBrick, Brick> = when {
-            blocks.size != 2 -> InvalidBlocks.left()
-            notNextToEach(blocks) -> InvalidBlocks.left()
-            else -> DuoBrick(blocks.toList()).right()
+        fun of(first: Block, second: Block): Either<InvalidBrick, Brick> = when {
+            !first.isNextTo(second) -> InvalidBlocks.left()
+            first.outOfMap() || second.outOfMap() -> InvalidPosition.left()
+            else -> DuoBrick(listOf(first, second)).right()
         }
-
-        private fun notNextToEach(blocks: Array<out Block>) = !blocks[0].isNextTo(blocks[1])
     }
 }
 
-class Block private constructor(val x: Int, val y: Int) {
+data class Block(val x: Int, val y: Int) {
 
     fun isNextTo(block: Block) = (abs(x - block.x) == 1) xor (abs(y - block.y) == 1)
 
-    companion object {
-        fun of(x: Int, y: Int): Either<InvalidBrick, Block> = when {
-            x < 0 || y < 0 -> InvalidPosition.left()
-            else -> Block(x, y).right()
-        }
-    }
+    internal fun outOfMap() = x < 0 || y < 0
 }
 
 sealed class InvalidBrick {

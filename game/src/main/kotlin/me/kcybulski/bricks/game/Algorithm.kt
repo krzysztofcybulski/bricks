@@ -1,7 +1,6 @@
 package me.kcybulski.bricks.game
 
 import com.github.javafaker.Faker
-import me.kcybulski.bricks.game.Identity.Companion.default
 
 sealed class MoveTrigger {
 
@@ -13,8 +12,6 @@ sealed class MoveTrigger {
 interface Algorithm {
 
     val identity: Identity
-        get() = default()
-
     suspend fun initialize(game: NewGame): Unit
     suspend fun move(last: MoveTrigger): Brick
 

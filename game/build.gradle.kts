@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation(project(":events"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
     api("io.arrow-kt:arrow-core:1.0.0")
     implementation("com.github.javafaker:javafaker:1.0.2")
