@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.6.0-M1"
+    id("io.ratpack.ratpack-java")
 }
 
 group = "me.kcybulski.bricks"
