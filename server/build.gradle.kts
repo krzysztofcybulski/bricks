@@ -1,20 +1,5 @@
-import ratpack.gradle.RatpackPlugin
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("io.ratpack:ratpack-gradle:1.9.0")
-    }
-}
-
 plugins {
     kotlin("jvm") version "1.6.0-M1"
-}
-
-apply {
-    plugin<RatpackPlugin>()
 }
 
 group = "me.kcybulski.bricks"
