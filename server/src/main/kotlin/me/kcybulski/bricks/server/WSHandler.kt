@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.common.runBlocking
 import kotlinx.coroutines.coroutineScope
+import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.ReadyMessage
 import me.kcybulski.bricks.web.RegisterMessage
@@ -34,6 +35,7 @@ class WSHandler(
             is RegisterMessage -> lobby.registerPlayer(message.name, connection)
             is ReadyMessage -> lobby.ready(connection)
             is MoveMessage -> lobby.moved(connection, message)
+            is ImHealthy -> lobby.healthy(connection)
         }
     }
 }

@@ -30,6 +30,7 @@ class PlayerConnection(
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {
 
+    val healthChannel = Channel<Boolean>()
     val channel = Channel<UserMessage>()
 
     override val identity: Identity = Identity(name)
@@ -49,7 +50,7 @@ class PlayerConnection(
 
     suspend fun isHealthy(): Boolean {
         send(HowAreYou)
-        return withTimeoutOrNull(500) { channel.receive() is ImHealthy } ?: false
+        return withTimeoutOrNull(500) { healthChannel.receive() } ?: false
     }
 
     private fun send(message: ServerMessage) {

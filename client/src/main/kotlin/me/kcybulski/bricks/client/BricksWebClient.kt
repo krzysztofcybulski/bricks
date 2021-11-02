@@ -12,7 +12,7 @@ class BricksWebClient(host: String, port: Int = 80) {
         install(WebSockets)
     }, host, port, jacksonObjectMapper())
 
-    fun register(algorithm: Algorithm) {
-        websocket.connect(algorithm)
+    fun register(lobby: String, algorithm: Algorithm) {
+        websocket.connect(lobby, algorithm)
     }
 }

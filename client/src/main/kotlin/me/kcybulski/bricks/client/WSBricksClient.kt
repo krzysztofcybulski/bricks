@@ -43,9 +43,9 @@ internal class WSBricksClient(
 
     private val logger = KotlinLogging.logger {}
 
-    fun connect(bricks: Algorithm) {
+    fun connect(lobby: String, bricks: Algorithm) {
         runBlocking {
-            http.webSocket(method = Get, host = host, port = port, path = "/game") {
+            http.webSocket(method = Get, host = host, port = port, path = "/${lobby}/game") {
                 sendJson(RegisterMessage(bricks.identity.name))
                 logger.info { "Registered as ${bricks.identity.name}" }
                 incoming.consumeAsFlow()

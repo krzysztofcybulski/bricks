@@ -41,8 +41,13 @@ class OpenLobby(
         players.find { it.webSocket == connection }?.channel?.send(message)
     }
 
+    suspend fun healthy(connection: WebSocket) {
+        players.find { it.webSocket == connection }?.healthChannel?.send(true)
+    }
+
     suspend fun refresh() = coroutineScope {
-        players.removeAll(players.filter { it.isHealthy() })
+        val toRemove = players.filter { !it.isHealthy() }
+        players.removeAll(toRemove)
     }
 
 }
