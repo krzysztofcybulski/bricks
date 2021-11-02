@@ -56,7 +56,7 @@ fun main() {
                         }
                     }
                     .get(".well-known/acme-challenge/${getProperty("ACME_KEY")}") { ctx ->
-                        ctx.render("${getProperty("ACME_KEY")}_${getProperty("ACME_DATA")}")
+                        ctx.render("${getProperty("ACME_KEY")}.${getProperty("ACME_DATA")}")
                     }
             }
     }
