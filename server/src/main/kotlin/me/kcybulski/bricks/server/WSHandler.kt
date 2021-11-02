@@ -20,8 +20,6 @@ class WSHandler(
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : WebSocketHandler<String> {
 
-    private val logger = KotlinLogging.logger {}
-
     override fun onOpen(webSocket: WebSocket): String? = null
 
     override fun onClose(close: WebSocketClose<String>) {}
