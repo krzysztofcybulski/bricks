@@ -9,6 +9,7 @@ import ratpack.server.RatpackServer
 import ratpack.server.RatpackServerSpec
 import ratpack.websocket.WebSockets.websocket
 import java.lang.System.getProperty
+import java.lang.System.getenv
 
 fun main() {
     val tournaments = TournamentFacade(EventBus())
@@ -55,8 +56,8 @@ fun main() {
                                 .let { ctx.render(json(it)) }
                         }
                     }
-                    .get(".well-known/acme-challenge/${getProperty("ACME_KEY")}") { ctx ->
-                        ctx.render("${getProperty("ACME_KEY")}.${getProperty("ACME_DATA")}")
+                    .get(".well-known/acme-challenge/${getenv("ACME_KEY")}") { ctx ->
+                        ctx.render("${getenv("ACME_KEY")}.${getenv("ACME_DATA")}")
                     }
             }
     }
