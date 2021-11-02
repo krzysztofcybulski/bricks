@@ -56,9 +56,6 @@ fun main() {
                                 .let { ctx.render(json(it)) }
                         }
                     }
-                    .get(".well-known/acme-challenge/${getenv("ACME_KEY")}") { ctx ->
-                        ctx.render("${getenv("ACME_KEY")}.${getenv("ACME_DATA")}")
-                    }
             }
     }
 }
