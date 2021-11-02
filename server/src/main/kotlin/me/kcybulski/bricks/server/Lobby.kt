@@ -2,6 +2,7 @@ package me.kcybulski.bricks.server
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult
@@ -39,6 +40,11 @@ class OpenLobby(
     suspend fun moved(connection: WebSocket, message: MoveMessage) {
         players.find { it.webSocket == connection }?.channel?.send(message)
     }
+
+    suspend fun refresh() = coroutineScope {
+        players.removeAll(players.filter { it.isHealthy() })
+    }
+
 }
 
 class InGameLobby(

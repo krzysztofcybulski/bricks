@@ -4,6 +4,8 @@ import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
 import me.kcybulski.bricks.game.Brick
@@ -13,6 +15,8 @@ import me.kcybulski.bricks.game.MoveTrigger
 import me.kcybulski.bricks.game.NewGame
 import me.kcybulski.bricks.web.FirstMoveMessage
 import me.kcybulski.bricks.web.GameStartedMessage
+import me.kcybulski.bricks.web.HowAreYou
+import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.PositionMessage
 import me.kcybulski.bricks.web.ReadyMessage
@@ -41,6 +45,11 @@ class PlayerConnection(
             is MoveTrigger.OpponentMoved -> send(MoveMessage(last.brick.blocks.map { PositionMessage(it.x, it.y) }))
         }
         return (channel.receive() as MoveMessage).toBrick()
+    }
+
+    suspend fun isHealthy(): Boolean {
+        send(HowAreYou)
+        return withTimeoutOrNull(500) { channel.receive() is ImHealthy } ?: false
     }
 
     private fun send(message: ServerMessage) {

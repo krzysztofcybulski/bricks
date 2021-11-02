@@ -25,6 +25,8 @@ import me.kcybulski.bricks.game.NewGame
 import me.kcybulski.bricks.game.PlayersPair
 import me.kcybulski.bricks.web.FirstMoveMessage
 import me.kcybulski.bricks.web.GameStartedMessage
+import me.kcybulski.bricks.web.HowAreYou
+import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.PositionMessage
 import me.kcybulski.bricks.web.ReadyMessage
@@ -74,6 +76,7 @@ internal class WSBricksClient(
                                 logger.info { "Placed brick on ${move.blocks.joinToString(",") { "${it.x}x${it.y}" }}" }
                                 sendJson(from(move))
                             }
+                            is HowAreYou -> sendJson(ImHealthy)
                         }
                     }
             }

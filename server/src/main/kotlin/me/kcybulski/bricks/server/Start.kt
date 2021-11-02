@@ -12,6 +12,7 @@ import ratpack.websocket.WebSockets.websocket
 fun main() {
     val tournaments = TournamentFacade(EventBus())
     val entrance = Entrance(LobbyFactory())
+    Healthchecker(entrance).start()
     entrance.newLobby()
     RatpackServer.start { server: RatpackServerSpec ->
         server
