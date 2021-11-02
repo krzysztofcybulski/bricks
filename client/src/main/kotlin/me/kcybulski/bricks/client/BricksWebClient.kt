@@ -6,7 +6,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.websocket.WebSockets
 import me.kcybulski.bricks.game.Algorithm
 
-class BricksWebClient(host: String, port: Int) {
+class BricksWebClient(host: String, port: Int = 80) {
 
     private val websocket = WSBricksClient(HttpClient(CIO) {
         install(WebSockets)

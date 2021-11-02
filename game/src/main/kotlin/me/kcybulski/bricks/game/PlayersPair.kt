@@ -16,4 +16,7 @@ data class PlayersPair(
         second -> first
         else -> throw IllegalArgumentException("No such identity")
     }
+
+    fun names() = first.name to second.name
+
 }
