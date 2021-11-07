@@ -32,20 +32,20 @@ object GameMapRenderer {
         }
 
     private fun toString(block: MapBlock, colors: Map<Identity, String>): String = when (block) {
-        Empty -> "⚪"
+        Empty -> "⬜"
         is Taken -> colors[block.owner] ?: "❓"
     }
 
     private fun playerToColor(identity: Identity, colors: List<String>) = colors[identity.hashCode().absoluteValue % colors.size]
 
-    val COLORS = listOf(
-        "\uD83D\uDD34",
-        "\uD83D\uDFE0",
-        "\uD83D\uDFE1",
-        "\uD83D\uDFE2",
-        "\uD83D\uDD35",
-        "\uD83D\uDFE3",
-        "\uD83D\uDFE4"
+    private val COLORS = listOf(
+        "\uD83D\uDFE5",
+        "\uD83D\uDFE7",
+        "\uD83D\uDFE8",
+        "\uD83D\uDFE9",
+        "\uD83D\uDFE6",
+        "\uD83D\uDFEA",
+        "\uD83D\uDFEB"
     )
 
 }

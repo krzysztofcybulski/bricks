@@ -9,7 +9,8 @@ import me.kcybulski.bricks.tournament.TournamentFacade
 import ratpack.func.Action
 import ratpack.handling.Chain
 import ratpack.handling.Context
-import ratpack.jackson.Jackson
+import ratpack.jackson.Jackson.fromJson
+import ratpack.jackson.Jackson.json
 import ratpack.server.RatpackServer
 import ratpack.websocket.WebSockets
 import java.util.UUID
@@ -40,11 +41,11 @@ class Server(
                         .get { _ ->
                             entrance.lobbies()
                                 .map(Lobby::toResponse)
-                                .let { ctx.render(Jackson.json(it)) }
+                                .let { ctx.render(json(it)) }
                         }
                         .post { _ ->
                             entrance.newLobby().let {
-                                ctx.render(Jackson.json(it))
+                                ctx.render(json(it))
                             }
                         }
                 }
@@ -52,7 +53,7 @@ class Server(
             .get(":lobby") { ctx ->
                 entrance.lobby(ctx) { lobby ->
                     lobby.toResultsResponse()
-                        .let { ctx.render(Jackson.json(it)) }
+                        .let { ctx.render(json(it)) }
                 }
             }
             .get(":lobby/game") { ctx ->
@@ -65,9 +66,16 @@ class Server(
             }
             .post(":lobby/start") { ctx ->
                 entrance.lobby(ctx) { lobby ->
-                    entrance.start(lobby.name, tournaments)
-                    lobby.toResultsResponse()
-                        .let { ctx.render(Jackson.json(it)) }
+                    ctx.parse(fromJson(StartRequest::class.java))
+                        .map {
+                            entrance.start(lobby.name, tournaments, it.toSettings())
+                        }
+                        .map {
+                            lobby.toResultsResponse()
+                        }
+                        .then {
+                            ctx.render(json(it))
+                        }
                 }
             }
             .get("games/:gameId/:time?") { ctx ->

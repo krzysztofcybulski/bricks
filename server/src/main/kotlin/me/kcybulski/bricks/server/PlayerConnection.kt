@@ -4,7 +4,6 @@ import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
@@ -16,7 +15,6 @@ import me.kcybulski.bricks.game.NewGame
 import me.kcybulski.bricks.web.FirstMoveMessage
 import me.kcybulski.bricks.web.GameStartedMessage
 import me.kcybulski.bricks.web.HowAreYou
-import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.PositionMessage
 import me.kcybulski.bricks.web.ReadyMessage
@@ -37,7 +35,8 @@ class PlayerConnection(
 
     override suspend fun initialize(game: NewGame) {
         send(GameStartedMessage(game.id, listOf(game.players.first.name, game.players.second.name), game.size))
-        channel.receive() as ReadyMessage
+        while (channel.receive() !is ReadyMessage) {
+        }
     }
 
     override suspend fun move(last: MoveTrigger): Brick {

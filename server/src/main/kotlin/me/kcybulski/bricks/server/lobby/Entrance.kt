@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import me.kcybulski.bricks.tournament.TournamentFacade
+import me.kcybulski.bricks.tournament.TournamentSettings
 import java.util.concurrent.Executors
 
 class Entrance(
@@ -25,12 +26,12 @@ class Entrance(
         lobbies[it.name] = it
     }
 
-    fun start(name: String, tournaments: TournamentFacade): InGameLobby? {
+    fun start(name: String, tournaments: TournamentFacade, settings: TournamentSettings): InGameLobby? {
         val lobby = lobbies[name]
         if (lobby !is OpenLobby) {
             return null
         }
-        val inProgress = lobby.inProgress(tournaments)
+        val inProgress = lobby.inProgress(tournaments, settings)
             .also { lobbies[name] = it }
         lobbiesScope.launch {
             inProgress

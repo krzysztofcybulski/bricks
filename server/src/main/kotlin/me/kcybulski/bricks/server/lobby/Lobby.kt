@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult
+import me.kcybulski.bricks.tournament.TournamentSettings
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.ReadyMessage
 import ratpack.websocket.WebSocket
@@ -30,7 +31,7 @@ class OpenLobby(
         players += PlayerConnection(name, webSocket)
     }
 
-    fun inProgress(tournaments: TournamentFacade) = InGameLobby(name, players, tournaments)
+    fun inProgress(tournaments: TournamentFacade, settings: TournamentSettings) = InGameLobby(name, settings, players, tournaments)
 
     override fun playerNames(): List<String> = players.map(PlayerConnection::name)
 
@@ -55,6 +56,7 @@ class OpenLobby(
 
 class InGameLobby(
     name: String,
+    private val settings: TournamentSettings,
     private val players: List<PlayerConnection>,
     private val tournaments: TournamentFacade
 ) : Lobby(name) {
@@ -68,10 +70,7 @@ class InGameLobby(
         withContext(gameScope.coroutineContext) {
             ClosedLobby(
                 name,
-                tournaments.play(players) {
-                    initTime = 1000
-                    moveTime = 500
-                },
+                tournaments.play(players, settings),
                 playerNames()
             )
         }

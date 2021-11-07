@@ -12,10 +12,15 @@ class TournamentFacade(
     suspend fun play(
         algorithms: List<Algorithm>,
         settingsBuilder: TournamentSettingsBuilder.() -> Unit = {}
+    ) = play(algorithms, settings(settingsBuilder))
+
+    suspend fun play(
+        algorithms: List<Algorithm>,
+        settings: TournamentSettings
     ): TournamentResult = Tournament(
         rounds = plan(algorithms.map(Algorithm::identity)),
         algorithms = algorithms,
-        settings = settings(settingsBuilder),
+        settings = settings,
         events = events
     ).playTournament()
 
