@@ -19,7 +19,7 @@ class GameCoordinator(
 
     suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame {
         val game = NewGame(randomUUID(), players, mapSize)
-        events.send(GameStartedEvent(game.id, players))
+        events.send(GameStartedEvent(game.id, game.size, players), game.id.toString())
         return initialize(startingPlayer, game)
     }
 
@@ -41,7 +41,7 @@ class GameCoordinator(
 
     private suspend fun currentPlayerMove(game: InProgressGame, lastMove: MoveTrigger) =
         withTimeoutOrNull(gameSettings.moveTime) { algorithms[game.currentPlayer].move(lastMove) }
-            ?.also { events.send(PlayerMovedEvent(game.id, game.currentPlayer, it)) }
+            ?.also { events.send(PlayerMovedEvent(game.id, game.currentPlayer, it), game.id.toString()) }
             ?.let { next(game.placed(it), OpponentMoved(it)) }
             ?: game.lost()
 
@@ -55,7 +55,7 @@ class GameCoordinator(
     private suspend fun init(player: Algorithm, game: NewGame) =
         withTimeoutOrNull(gameSettings.initTime) { player.initialize(game) }
             ?.let { PlayerInitializedInTime(player.identity)
-                .also { events.send(PlayerInitializedEvent(game.id, player.identity))} }
+                .also { events.send(PlayerInitializedEvent(game.id, player.identity), game.id.toString())} }
             ?: PlayerExceededInitTimeout(player.identity)
                 .also { events.send(PlayerNotInitializedInTimeEvent(game.id, player.identity))}
 

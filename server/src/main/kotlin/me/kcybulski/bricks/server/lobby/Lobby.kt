@@ -1,9 +1,10 @@
-package me.kcybulski.bricks.server
+package me.kcybulski.bricks.server.lobby
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult
 import me.kcybulski.bricks.web.MoveMessage

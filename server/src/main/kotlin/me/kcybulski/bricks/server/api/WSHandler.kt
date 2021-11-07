@@ -1,15 +1,15 @@
-package me.kcybulski.bricks.server
+package me.kcybulski.bricks.server.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.common.runBlocking
 import kotlinx.coroutines.coroutineScope
+import me.kcybulski.bricks.server.lobby.OpenLobby
 import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.ReadyMessage
 import me.kcybulski.bricks.web.RegisterMessage
 import me.kcybulski.bricks.web.UserMessage
-import mu.KotlinLogging
 import ratpack.websocket.WebSocket
 import ratpack.websocket.WebSocketClose
 import ratpack.websocket.WebSocketHandler

@@ -1,65 +1,24 @@
 package me.kcybulski.bricks.server
 
 import me.kcybulski.bricks.events.EventBus
+import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
+import me.kcybulski.bricks.server.api.Server
+import me.kcybulski.bricks.server.lobby.Entrance
+import me.kcybulski.bricks.server.lobby.Healthchecker
+import me.kcybulski.bricks.server.lobby.LobbyFactory
 import me.kcybulski.bricks.tournament.TournamentFacade
-import ratpack.handling.Chain
-import ratpack.handling.Context
-import ratpack.jackson.Jackson.json
-import ratpack.server.RatpackServer
-import ratpack.server.RatpackServerSpec
-import ratpack.websocket.WebSockets.websocket
-import java.lang.System.getProperty
-import java.lang.System.getenv
+import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 
 fun main() {
-    val tournaments = TournamentFacade(EventBus())
-    val entrance = Entrance(LobbyFactory())
-    Healthchecker(entrance).start()
-    entrance.newLobby()
-    RatpackServer.start { server: RatpackServerSpec ->
-        server
-            .handlers { chain: Chain ->
-                chain
-                    .path { ctx ->
-                        ctx.byMethod { method ->
-                            method
-                                .get { _ ->
-                                    entrance.lobbies()
-                                        .map(Lobby::toResponse)
-                                        .let { ctx.render(json(it)) }
-                                }
-                                .post { _ ->
-                                    entrance.newLobby().let {
-                                        ctx.render(json(it))
-                                    }
-                                }
-                        }
-                    }
-                    .get(":lobby") { ctx ->
-                        entrance.lobby(ctx) { lobby ->
-                            lobby.toResultsResponse()
-                                .let { ctx.render(json(it)) }
-                        }
-                    }
-                    .get(":lobby/game") { ctx ->
-                        entrance.lobby(ctx) {
-                            when (it) {
-                                is OpenLobby -> websocket(ctx, WSHandler(it))
-                                else -> ctx.response.status(400)
-                            }
-                        }
-                    }
-                    .post(":lobby/start") { ctx ->
-                        entrance.lobby(ctx) { lobby ->
-                            entrance.start(lobby.name, tournaments)
-                            lobby.toResultsResponse()
-                                .let { ctx.render(json(it)) }
-                        }
-                    }
-            }
-    }
-}
+    val eventStore = InMemoryEventStore.create()
 
-private fun Entrance.lobby(ctx: Context, handler: (Lobby) -> Unit) = get(ctx.pathTokens["lobby"]!!)
-    ?.let { handler(it) }
-    ?: ctx.notFound()
+    val entrance = Entrance(LobbyFactory())
+    val tournaments = TournamentFacade(EventBus(eventStore))
+    val gameHistory = GameHistoriesFacade(eventStore)
+
+    Healthchecker(entrance).start()
+
+    entrance.newLobby()
+
+    Server(entrance, tournaments, gameHistory).run { start() }
+}

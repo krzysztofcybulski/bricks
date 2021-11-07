@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server
+package me.kcybulski.bricks.server.lobby
 
 import com.github.javafaker.Faker
 

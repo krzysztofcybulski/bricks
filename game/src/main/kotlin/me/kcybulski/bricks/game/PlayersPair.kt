@@ -5,8 +5,6 @@ data class PlayersPair(
     val second: Identity
 ) {
 
-    fun starting(player: Identity) = if(first == player) this else swap()
-
     private fun swap() = PlayersPair(first, second)
 
     operator fun contains(player: Identity) = first == player || second == player

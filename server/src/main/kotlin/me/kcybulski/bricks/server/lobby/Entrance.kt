@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server
+package me.kcybulski.bricks.server.lobby
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
