@@ -33,6 +33,7 @@ object GameMapRenderer {
 
     private fun toString(block: MapBlock, colors: Map<Identity, String>): String = when (block) {
         Empty -> "⬜"
+        MapBlock.StartingBlock -> "\uD83D\uDCA9"
         is Taken -> colors[block.owner] ?: "❓"
     }
 

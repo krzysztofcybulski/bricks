@@ -33,7 +33,8 @@ interface ServerMessage
 data class GameStartedMessage(
     val id: UUID,
     val playerNames: List<String>,
-    val size: Int
+    val size: Int,
+    val blocks: List<PositionMessage>
 ) : ServerMessage
 
 class FirstMoveMessage : ServerMessage

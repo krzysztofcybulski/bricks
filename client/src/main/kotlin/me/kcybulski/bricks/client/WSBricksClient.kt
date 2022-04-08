@@ -5,20 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.client.features.websocket.webSocket
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.runBlocking
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
 import me.kcybulski.bricks.game.Brick
 import me.kcybulski.bricks.game.DuoBrick
+import me.kcybulski.bricks.game.GameMap
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
 import me.kcybulski.bricks.game.NewGame
@@ -35,51 +33,55 @@ import me.kcybulski.bricks.web.ServerMessage
 import mu.KotlinLogging
 
 internal class WSBricksClient(
-    val http: HttpClient,
-    val host: String,
-    val port: Int,
-    val jackson: ObjectMapper
+    private val http: HttpClient,
+    private val host: String,
+    private val port: Int,
+    private val jackson: ObjectMapper
 ) {
 
     private val logger = KotlinLogging.logger {}
 
-    fun connect(lobby: String, bricks: Algorithm) {
-        runBlocking {
-            http.webSocket(method = Get, host = host, port = port, path = "/${lobby}/game") {
-                sendJson(RegisterMessage(bricks.identity.name))
-                logger.info { "Registered as ${bricks.identity.name}" }
-                incoming.consumeAsFlow()
-                    .mapNotNull { it as? Frame.Text }
-                    .map { it.fromJson<ServerMessage>() }
-                    .collect {
-                        when (it) {
-                            is GameStartedMessage -> {
-                                logger.info { "Game ${it.id} started vs ${it.playerNames.filterNot { name -> name == bricks.identity.name }.first()}." }
-                                bricks.initialize(
-                                    NewGame(
-                                        it.id,
-                                        PlayersPair(
-                                            Identity(it.playerNames[0]),
-                                            Identity(it.playerNames[1])
-                                        ),
-                                        it.size
-                                    )
+    suspend fun connect(lobby: String, bricks: Algorithm) {
+        http.webSocket(method = Get, host = host, port = port, path = "/${lobby}/game") {
+            sendJson(RegisterMessage(bricks.identity.name))
+            logger.info { "Registered as ${bricks.identity.name}" }
+            incoming.consumeAsFlow()
+                .mapNotNull { it as? Frame.Text }
+                .map { it.fromJson<ServerMessage>() }
+                .collect {
+                    when (it) {
+                        is GameStartedMessage -> {
+                            logger.info {
+                                "Game ${it.id} started vs ${
+                                    it.playerNames.filterNot { name -> name == bricks.identity.name }.first()
+                                }."
+                            }
+                            bricks.initialize(
+                                NewGame(
+                                    it.id,
+                                    PlayersPair(
+                                        Identity(it.playerNames[0]),
+                                        Identity(it.playerNames[1])
+                                    ),
+                                    GameMap
+                                        .of(it.size)
+                                        .withBlocks(it.blocks.map(::toMove).toSet())
                                 )
-                                sendJson(ReadyMessage)
-                            }
-                            is FirstMoveMessage, is MoveMessage -> {
-                                when(it) {
-                                    is FirstMoveMessage -> logger.info { "Waiting for your first move" }
-                                    is MoveMessage -> logger.info { "Opponent placed ${it.blocks.joinToString(",") { "${it.x}x${it.y}" }}" }
-                                }
-                                val move = bricks.move(toMove(it))
-                                logger.info { "Placed brick on ${move.blocks.joinToString(",") { "${it.x}x${it.y}" }}" }
-                                sendJson(from(move))
-                            }
-                            is HowAreYou -> sendJson(ImHealthy)
+                            )
+                            sendJson(ReadyMessage)
                         }
+                        is FirstMoveMessage, is MoveMessage -> {
+                            when (it) {
+                                is FirstMoveMessage -> logger.info { "Waiting for your first move" }
+                                is MoveMessage -> logger.info { "Opponent placed ${it.blocks.joinToString(",") { "${it.x}x${it.y}" }}" }
+                            }
+                            val move = bricks.move(toMove(it))
+                            logger.info { "Placed brick on ${move.blocks.joinToString(",") { "${it.x}x${it.y}" }}" }
+                            sendJson(from(move))
+                        }
+                        is HowAreYou -> sendJson(ImHealthy)
                     }
-            }
+                }
         }
     }
 
@@ -97,6 +99,8 @@ internal class WSBricksClient(
         is FirstMoveMessage -> MoveTrigger.FirstMove
         else -> throw IllegalStateException("Unknown move!")
     }
+
+    private fun toMove(message: PositionMessage) = Block(message.x, message.y)
 
     private fun from(move: Brick) = MoveMessage(move.blocks.map { PositionMessage(it.x, it.y) })
 

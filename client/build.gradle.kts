@@ -18,6 +18,7 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:1.6.4")
     implementation("io.ktor:ktor-client-core:1.6.4")
     implementation("io.ktor:ktor-client-cio:1.6.4")
+    implementation("io.ktor:ktor-client-jackson:1.6.4")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     implementation("com.github.javafaker:javafaker:1.0.2")

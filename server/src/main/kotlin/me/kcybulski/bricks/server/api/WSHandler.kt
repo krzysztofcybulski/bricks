@@ -2,9 +2,10 @@ package me.kcybulski.bricks.server.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.kotest.common.runBlocking
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.server.lobby.OpenLobby
 import me.kcybulski.bricks.web.ImHealthy
@@ -20,6 +21,7 @@ import ratpack.websocket.WebSocketMessage
 
 class WSHandler(
     private val lobby: OpenLobby,
+    private val coroutine: CoroutineScope,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : WebSocketHandler<String> {
 
@@ -29,10 +31,12 @@ class WSHandler(
 
     override fun onClose(close: WebSocketClose<String>) {}
 
-    override fun onMessage(frame: WebSocketMessage<String>): Unit = runBlocking {
-        parseUserMessage(frame)
-            .onSuccess { handleMessage(it, frame.connection) }
-            .onFailure { logger.warn(it) { "Ignoring user message ${frame.text}" } }
+    override fun onMessage(frame: WebSocketMessage<String>) {
+        coroutine.launch {
+            parseUserMessage(frame)
+                .onSuccess { handleMessage(it, frame.connection) }
+                .onFailure { logger.warn(it) { "Ignoring user message ${frame.text}" } }
+        }
     }
 
     private suspend fun parseUserMessage(frame: WebSocketMessage<String>) = withContext(IO) {

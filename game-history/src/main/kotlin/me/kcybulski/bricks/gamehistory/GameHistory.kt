@@ -22,6 +22,7 @@ class GameHistory internal constructor(
     }) { map, event ->
         when (event) {
             is GameStartedEvent -> GameMap(event.players, Array(event.size) { Array(event.size) { Empty } })
+                .withStartingBlocks(event.startingBlocks)
             is PlayerMovedEvent -> map?.placed(event)
             else -> map
         }
@@ -38,11 +39,17 @@ class GameMap(
         event.brick.blocks.fold(blocks) { map, pos -> map.with(pos, Taken(event.player)) }
     )
 
+    fun withStartingBlocks(startingBlocks: Set<Block>) = GameMap(
+        players,
+        startingBlocks.fold(blocks) { blocks, b -> blocks.with(b, MapBlock.StartingBlock) }
+    )
+
 }
 
 sealed class MapBlock {
 
     object Empty : MapBlock()
+    object StartingBlock : MapBlock()
     class Taken(val owner: Identity) : MapBlock()
 
 }

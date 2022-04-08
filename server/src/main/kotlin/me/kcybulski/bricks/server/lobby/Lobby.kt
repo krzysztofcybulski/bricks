@@ -1,5 +1,6 @@
 package me.kcybulski.bricks.server.lobby
 
+import jdk.jfr.Registered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
@@ -10,6 +11,7 @@ import me.kcybulski.bricks.tournament.TournamentResult
 import me.kcybulski.bricks.tournament.TournamentSettings
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.ReadyMessage
+import mu.KotlinLogging
 import ratpack.websocket.WebSocket
 import java.util.concurrent.Executors.newSingleThreadExecutor
 
@@ -25,9 +27,11 @@ class OpenLobby(
     name: String
 ) : Lobby(name) {
 
+    private val logger = KotlinLogging.logger {}
     private val players: MutableList<PlayerConnection> = mutableListOf()
 
     fun registerPlayer(name: String, webSocket: WebSocket) {
+        logger.info { "${this@OpenLobby.name} - Registered player $name" }
         players += PlayerConnection(name, webSocket)
     }
 

@@ -8,6 +8,7 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.MoveTrigger.FirstMove
 import me.kcybulski.bricks.game.MoveTrigger.OpponentMoved
 import java.util.UUID.randomUUID
+import kotlin.random.Random
 
 class GameCoordinator(
     private val algorithms: AlgorithmsPair,
@@ -18,8 +19,9 @@ class GameCoordinator(
     val players = algorithms.players()
 
     suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame {
-        val game = NewGame(randomUUID(), players, mapSize)
-        events.send(GameStartedEvent(game.id, game.size, players), game.id.toString())
+        val randomBlocks = randomBlocks(mapSize)
+        val game = NewGame(randomUUID(), players, GameMap.of(mapSize).withBlocks(randomBlocks))
+        events.send(GameStartedEvent(game.id, mapSize, players, randomBlocks), game.id.toString())
         return initialize(startingPlayer, game)
     }
 
@@ -58,5 +60,10 @@ class GameCoordinator(
                 .also { events.send(PlayerInitializedEvent(game.id, player.identity), game.id.toString())} }
             ?: PlayerExceededInitTimeout(player.identity)
                 .also { events.send(PlayerNotInitializedInTimeEvent(game.id, player.identity))}
+
+    private fun randomBlocks(mapSize: Int) =
+        (0..gameSettings.randomBricksAmount(mapSize))
+            .map { Block(Random.nextInt(mapSize), Random.nextInt(mapSize)) }
+            .toSet()
 
 }

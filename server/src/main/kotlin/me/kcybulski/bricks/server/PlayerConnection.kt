@@ -34,7 +34,14 @@ class PlayerConnection(
     override val identity: Identity = Identity(name)
 
     override suspend fun initialize(game: NewGame) {
-        send(GameStartedMessage(game.id, listOf(game.players.first.name, game.players.second.name), game.size))
+        send(
+            GameStartedMessage(
+                id = game.id,
+                playerNames = listOf(game.players.first.name, game.players.second.name),
+                size = game.map.size,
+                blocks = game.map.blocks.map { PositionMessage(it.x, it.y) }
+            )
+        )
         while (channel.receive() !is ReadyMessage) {
         }
     }

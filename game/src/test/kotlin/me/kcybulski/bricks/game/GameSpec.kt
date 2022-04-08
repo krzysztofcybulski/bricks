@@ -19,13 +19,13 @@ class GameSpec : ShouldSpec({
 
     val coordinator = GameCoordinator(
         archer vs ciril,
-        GameSettings(initTime = 10, moveTime = 10),
+        GameSettings(initTime = 10, moveTime = 10, randomBrickChance = 1.0),
         EventBus()
     )
 
     suspend fun play(starting: Identity = archer.identity) = coordinator.play(starting, 3)
 
-    should("lose game when place out of map") {
+    should("lose game when placed out of map") {
         //given
         archer.nextMoveEither { horizontal(2, 1) }
 
@@ -49,6 +49,18 @@ class GameSpec : ShouldSpec({
 
         //then
         assertThat(endedGame).wonBy("Ciril")
+    }
+
+    should("lose game when placed on taken field") {
+        //given
+        archer.nextMoveEither { horizontal(0, 0) }
+        ciril.nextMoveEither { horizontal(1, 0) }
+
+        //when
+        val endedGame = play()
+
+        //then
+        assertThat(endedGame).wonBy("Archer")
     }
 
     should("play game until waited too long for move") {
@@ -90,5 +102,4 @@ class GameSpec : ShouldSpec({
         //then
         assertThat(endedGame).tied()
     }
-
 })

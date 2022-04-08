@@ -1,5 +1,6 @@
 package me.kcybulski.bricks.server.api
 
+import kotlinx.coroutines.CoroutineScope
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameMapRenderer
 import me.kcybulski.bricks.server.lobby.Entrance
@@ -18,7 +19,8 @@ import java.util.UUID
 class Server(
     private val entrance: Entrance,
     private val tournaments: TournamentFacade,
-    private val gameHistories: GameHistoriesFacade
+    private val gameHistories: GameHistoriesFacade,
+    private val coroutine: CoroutineScope
 ) {
 
     private val ratpackServer: RatpackServer = RatpackServer.of { server ->
@@ -59,7 +61,7 @@ class Server(
             .get(":lobby/game") { ctx ->
                 entrance.lobby(ctx) {
                     when (it) {
-                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(it))
+                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(it, coroutine))
                         else -> ctx.response.status(400)
                     }
                 }

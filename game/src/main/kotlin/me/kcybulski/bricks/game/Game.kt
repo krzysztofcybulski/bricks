@@ -11,14 +11,14 @@ sealed class Game(
 class NewGame(
     id: UUID = randomUUID(),
     players: PlayersPair,
-    val size: Int
+    val map: GameMap
 ) : Game(id, players) {
 
     fun started(startingPlayer: Identity = players.first) = InProgressGame(
         id = id,
         players = players,
         currentPlayer = startingPlayer,
-        map = Map.of(size)
+        map = map
     )
 
     fun won(player: Identity) = WonGame(id, player, players not player)
@@ -31,10 +31,11 @@ class InProgressGame(
     id: UUID,
     players: PlayersPair,
     val currentPlayer: Identity,
-    private val map: Map
+    private val map: GameMap
 ) : Game(id, players) {
 
-    fun placed(brick: Brick): Game = map.place(brick)
+    fun placed(brick: Brick): Game = map
+        .place(brick)
         .fold({ lost() }, { InProgressGame(id, players, nextPlayer, it) })
 
     fun lost() = WonGame(id, nextPlayer, currentPlayer)

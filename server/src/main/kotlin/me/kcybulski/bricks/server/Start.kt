@@ -1,5 +1,9 @@
 package me.kcybulski.bricks.server
 
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
+import kotlinx.coroutines.runBlocking
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.server.api.Server
@@ -9,7 +13,7 @@ import me.kcybulski.bricks.server.lobby.LobbyFactory
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 
-fun main() {
+fun main() = runBlocking {
     val eventStore = InMemoryEventStore.create()
 
     val entrance = Entrance(LobbyFactory())
@@ -20,5 +24,6 @@ fun main() {
 
     entrance.newLobby()
 
-    Server(entrance, tournaments, gameHistory).run { start() }
+    Server(entrance, tournaments, gameHistory, this).run { start() }
+    coroutineContext.job.join()
 }
