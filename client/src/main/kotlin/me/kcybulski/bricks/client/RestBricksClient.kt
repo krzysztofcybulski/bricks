@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.client
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 
 internal class RestBricksClient(
@@ -11,7 +12,7 @@ internal class RestBricksClient(
 
     private val url = "http://$host:$port"
 
-    suspend fun getLobbies(): List<Lobby> = httpClient.get(url)
+    suspend fun getLobbies(): List<Lobby> = httpClient.get(url).body()
 
 }
 

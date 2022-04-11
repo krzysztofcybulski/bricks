@@ -9,38 +9,35 @@ import me.kcybulski.bricks.server.lobby.OpenLobby
 
 data class LobbyWithStateResponse(
     val name: String,
-    val status: String
-)
-
-fun Lobby.toResponse() = when (this) {
-    is OpenLobby -> LobbyWithStateResponse(name, "OPEN")
-    is InGameLobby -> LobbyWithStateResponse(name, "IN_GAME")
-    is ClosedLobby -> LobbyWithStateResponse(name, "ENDED")
-}
-
-data class LobbyDetailsResponse(
-    val name: String,
-    val players: List<String>,
-    val games: List<EndedGameResponse>
+    val playerNames: List<String>,
+    val status: String,
+    val games: List<EndedGameResponse>,
 ) {
 
-    val points = games.groupBy { it.winner }.mapValues { (_, value) -> value.count() }
+    val points = games
+        .groupBy(EndedGameResponse::winner)
+        .mapValues { (_, value) -> value.count() }
 
 }
+
+fun Lobby.toResponse() = when (this) {
+    is OpenLobby -> toResponse("OPEN")
+    is InGameLobby -> toResponse("IN_GAME")
+    is ClosedLobby -> toResponse("ENDED", result.games)
+}
+
+private fun Lobby.toResponse(status: String, games: List<EndedGame> = emptyList()) =
+    LobbyWithStateResponse(
+        name,
+        playerNames(),
+        status,
+        games.map(EndedGame::toResponse)
+    )
 
 data class EndedGameResponse(
     val id: String,
     val winner: String,
     val players: List<String>
-)
-
-fun Lobby.toResultsResponse() = LobbyDetailsResponse(
-    name = name,
-    players = playerNames(),
-    games = when (this) {
-        is ClosedLobby -> result.games.map(EndedGame::toResponse)
-        else -> emptyList()
-    }
 )
 
 private fun EndedGame.toResponse() = EndedGameResponse(

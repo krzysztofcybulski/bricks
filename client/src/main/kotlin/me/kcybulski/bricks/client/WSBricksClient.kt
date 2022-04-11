@@ -3,12 +3,11 @@ package me.kcybulski.bricks.client
 import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.client.HttpClient
-import io.ktor.client.features.websocket.DefaultClientWebSocketSession
-import io.ktor.client.features.websocket.webSocket
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod.Companion.Get
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.readText
-import kotlinx.coroutines.flow.collect
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -16,6 +15,7 @@ import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
 import me.kcybulski.bricks.game.Brick
 import me.kcybulski.bricks.game.DuoBrick
+import me.kcybulski.bricks.game.GameInitialized
 import me.kcybulski.bricks.game.GameMap
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
@@ -57,15 +57,14 @@ internal class WSBricksClient(
                                 }."
                             }
                             bricks.initialize(
-                                NewGame(
+                                GameInitialized(
                                     it.id,
+                                    it.size,
                                     PlayersPair(
                                         Identity(it.playerNames[0]),
                                         Identity(it.playerNames[1])
                                     ),
-                                    GameMap
-                                        .of(it.size)
-                                        .withBlocks(it.blocks.map(::toMove).toSet())
+                                    it.blocks.map(::toMove).toSet()
                                 )
                             )
                             sendJson(ReadyMessage)

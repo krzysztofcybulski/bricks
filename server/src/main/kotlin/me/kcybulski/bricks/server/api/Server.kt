@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.server.api
 
 import kotlinx.coroutines.CoroutineScope
+import me.kcybulski.bricks.gamehistory.GameEventsRenderer
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameMapRenderer
 import me.kcybulski.bricks.server.lobby.Entrance
@@ -20,6 +21,7 @@ class Server(
     private val entrance: Entrance,
     private val tournaments: TournamentFacade,
     private val gameHistories: GameHistoriesFacade,
+    private val corsConfiguration: CorsConfiguration,
     private val coroutine: CoroutineScope
 ) {
 
@@ -37,6 +39,7 @@ class Server(
 
     private fun api(): Action<Chain> = Action { chain: Chain ->
         chain
+            .all(corsConfiguration::addCORSHeaders)
             .path { ctx ->
                 ctx.byMethod { method ->
                     method
@@ -54,14 +57,14 @@ class Server(
             }
             .get(":lobby") { ctx ->
                 entrance.lobby(ctx) { lobby ->
-                    lobby.toResultsResponse()
+                    lobby.toResponse()
                         .let { ctx.render(json(it)) }
                 }
             }
             .get(":lobby/game") { ctx ->
-                entrance.lobby(ctx) {
-                    when (it) {
-                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(it, coroutine))
+                entrance.lobby(ctx) { lobby ->
+                    when (lobby) {
+                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(lobby, coroutine))
                         else -> ctx.response.status(400)
                     }
                 }
@@ -69,16 +72,17 @@ class Server(
             .post(":lobby/start") { ctx ->
                 entrance.lobby(ctx) { lobby ->
                     ctx.parse(fromJson(StartRequest::class.java))
-                        .map {
-                            entrance.start(lobby.name, tournaments, it.toSettings())
-                        }
-                        .map {
-                            lobby.toResultsResponse()
-                        }
-                        .then {
-                            ctx.render(json(it))
-                        }
+                        .map { entrance.start(lobby.name, tournaments, it.toSettings()) }
+                        .map { lobby.toResponse() }
+                        .then { ctx.render(json(it)) }
                 }
+            }
+            .get("games/:gameId/events") { ctx ->
+                gameHistories.game(ctx.gameId)
+                    .getAllEvents()
+                    .map(GameEventsRenderer::toEventResponse)
+                    .let(::json)
+                    .let(ctx::render)
             }
             .get("games/:gameId/:time?") { ctx ->
                 gameHistories.game(ctx.gameId)

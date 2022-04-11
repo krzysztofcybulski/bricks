@@ -6,9 +6,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Brick
+import me.kcybulski.bricks.game.GameInitialized
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
-import me.kcybulski.bricks.game.NewGame
 
 class TestAlgorithm(
     name: String
@@ -40,7 +40,7 @@ class TestAlgorithm(
         return this
     }
 
-    override suspend fun initialize(game: NewGame) = coroutineScope {
+    override suspend fun initialize(gameInitialized: GameInitialized) = coroutineScope {
         delay(initTime)
     }
 

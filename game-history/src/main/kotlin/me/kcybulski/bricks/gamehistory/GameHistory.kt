@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.gamehistory
 
 import me.kcybulski.bricks.game.Block
+import me.kcybulski.bricks.game.GameEvent
 import me.kcybulski.bricks.game.GameStartedEvent
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.PlayerMovedEvent
@@ -22,11 +23,18 @@ class GameHistory internal constructor(
     }) { map, event ->
         when (event) {
             is GameStartedEvent -> GameMap(event.players, Array(event.size) { Array(event.size) { Empty } })
-                .withStartingBlocks(event.startingBlocks)
+                .withStartingBlocks(event.initialBlocks)
             is PlayerMovedEvent -> map?.placed(event)
             else -> map
         }
     }
+
+    fun getAllEvents(): List<GameEvent> = eventStore.read {
+        stream(StreamId(gameId.toString()))
+    }
+        .toList()
+        .map { it.payload as GameEvent }
+
 }
 
 class GameMap(

@@ -10,7 +10,7 @@ data class GameStartedEvent(
     override val gameId: UUID,
     val size: Int,
     val players: PlayersPair,
-    val startingBlocks: Set<Block>
+    val initialBlocks: Set<Block>
 ): GameEvent
 
 data class PlayerMovedEvent(

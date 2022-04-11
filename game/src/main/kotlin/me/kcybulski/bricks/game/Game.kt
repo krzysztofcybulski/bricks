@@ -11,7 +11,7 @@ sealed class Game(
 class NewGame(
     id: UUID = randomUUID(),
     players: PlayersPair,
-    val map: GameMap
+    private val map: GameMap
 ) : Game(id, players) {
 
     fun started(startingPlayer: Identity = players.first) = InProgressGame(

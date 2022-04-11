@@ -7,6 +7,7 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.AlgorithmsPair
 import me.kcybulski.bricks.game.GameCoordinator
+import me.kcybulski.bricks.game.GamesFactory
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.PlayersPair
 
@@ -14,6 +15,7 @@ internal class Tournament(
     private val rounds: List<Round>,
     private val algorithms: List<Algorithm>,
     private val settings: TournamentSettings,
+    private val gamesFactory: GamesFactory,
     private val events: EventBus
 ) {
 
@@ -30,7 +32,7 @@ internal class Tournament(
     }
 
     private suspend fun playDuel(duel: PlayersPair): DuelResult =
-        GameCoordinator(duel.algorithmsPair(algorithms), settings.game, events)
+        GameCoordinator(duel.algorithmsPair(algorithms), settings.game, gamesFactory, events)
             .let { DuelCoordinator(it, events) }
             .duel(*settings.mapSizesPerDuel.toIntArray())
 

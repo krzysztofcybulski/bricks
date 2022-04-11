@@ -34,7 +34,7 @@ data class GameStartedMessage(
     val id: UUID,
     val playerNames: List<String>,
     val size: Int,
-    val blocks: List<PositionMessage>
+    val blocks: Set<PositionMessage>
 ) : ServerMessage
 
 class FirstMoveMessage : ServerMessage

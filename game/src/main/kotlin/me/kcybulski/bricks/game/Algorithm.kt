@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.game
 
 import com.github.javafaker.Faker
+import java.util.UUID
 
 sealed class MoveTrigger {
 
@@ -9,10 +10,17 @@ sealed class MoveTrigger {
 
 }
 
+data class GameInitialized(
+    val gameId: UUID,
+    val size: Int,
+    val players: PlayersPair,
+    val initialBlocks: Set<Block>
+)
+
 interface Algorithm {
 
     val identity: Identity
-    suspend fun initialize(game: NewGame): Unit
+    suspend fun initialize(gameInitialized: GameInitialized)
     suspend fun move(last: MoveTrigger): Brick
 
 }

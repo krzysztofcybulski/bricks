@@ -17,9 +17,12 @@ class GameSpec : ShouldSpec({
     val archer = TestAlgorithm("Archer")
     val ciril = TestAlgorithm("Ciril")
 
+    val settings = GameSettings(initTime = 10, moveTime = 10, randomBrickChance = 1.0)
+
     val coordinator = GameCoordinator(
         archer vs ciril,
-        GameSettings(initTime = 10, moveTime = 10, randomBrickChance = 1.0),
+        settings,
+        GamesFactory(settings),
         EventBus()
     )
 

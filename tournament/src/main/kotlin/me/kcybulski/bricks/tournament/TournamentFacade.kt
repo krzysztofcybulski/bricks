@@ -2,6 +2,7 @@ package me.kcybulski.bricks.tournament
 
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.Algorithm
+import me.kcybulski.bricks.game.GamesFactory
 import me.kcybulski.bricks.tournament.RoundsPlanner.plan
 import me.kcybulski.bricks.tournament.TournamentSettings.Companion.settings
 
@@ -21,6 +22,7 @@ class TournamentFacade(
         rounds = plan(algorithms.map(Algorithm::identity)),
         algorithms = algorithms,
         settings = settings,
+        gamesFactory = GamesFactory(settings.game),
         events = events
     ).playTournament()
 

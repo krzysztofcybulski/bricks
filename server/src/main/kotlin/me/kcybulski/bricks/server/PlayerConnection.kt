@@ -9,6 +9,7 @@ import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
 import me.kcybulski.bricks.game.Brick
 import me.kcybulski.bricks.game.DuoBrick
+import me.kcybulski.bricks.game.GameInitialized
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
 import me.kcybulski.bricks.game.NewGame
@@ -33,13 +34,13 @@ class PlayerConnection(
 
     override val identity: Identity = Identity(name)
 
-    override suspend fun initialize(game: NewGame) {
+    override suspend fun initialize(gameInitialized: GameInitialized) {
         send(
             GameStartedMessage(
-                id = game.id,
-                playerNames = listOf(game.players.first.name, game.players.second.name),
-                size = game.map.size,
-                blocks = game.map.blocks.map { PositionMessage(it.x, it.y) }
+                id = gameInitialized.gameId,
+                playerNames = listOf(gameInitialized.players.first.name, gameInitialized.players.second.name),
+                size = gameInitialized.size,
+                blocks = gameInitialized.initialBlocks.map { PositionMessage(it.x, it.y) }.toSet()
             )
         )
         while (channel.receive() !is ReadyMessage) {

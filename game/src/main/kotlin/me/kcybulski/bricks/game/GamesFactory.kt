@@ -1,0 +1,25 @@
+package me.kcybulski.bricks.game
+
+import java.util.UUID.randomUUID
+import kotlin.random.Random
+
+class GamesFactory(
+    private val gameSettings: GameSettings
+) {
+
+    fun createNewGame(
+        players: PlayersPair,
+        mapSize: Int
+    ): Pair<GameInitialized, NewGame> {
+        val randomBlocks = randomBlocks(mapSize)
+        val gameId = randomUUID()
+        val game = NewGame(gameId, players, GameMap.of(mapSize).withBlocks(randomBlocks))
+        val gameInitialized = GameInitialized(gameId, mapSize, players, randomBlocks)
+        return gameInitialized to game
+    }
+
+    private fun randomBlocks(mapSize: Int) =
+        (0..gameSettings.randomBricksAmount(mapSize))
+            .map { Block(Random.nextInt(mapSize), Random.nextInt(mapSize)) }
+            .toSet()
+}

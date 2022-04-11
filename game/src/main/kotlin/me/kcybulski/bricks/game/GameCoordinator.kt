@@ -7,22 +7,20 @@ import kotlinx.coroutines.withTimeoutOrNull
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.MoveTrigger.FirstMove
 import me.kcybulski.bricks.game.MoveTrigger.OpponentMoved
-import java.util.UUID.randomUUID
-import kotlin.random.Random
 
 class GameCoordinator(
     private val algorithms: AlgorithmsPair,
     private val gameSettings: GameSettings,
+    private val gamesFactory: GamesFactory,
     private val events: EventBus
 ) {
 
     val players = algorithms.players()
 
     suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame {
-        val randomBlocks = randomBlocks(mapSize)
-        val game = NewGame(randomUUID(), players, GameMap.of(mapSize).withBlocks(randomBlocks))
-        events.send(GameStartedEvent(game.id, mapSize, players, randomBlocks), game.id.toString())
-        return initialize(startingPlayer, game)
+        val (gameInitialized, game) = gamesFactory.createNewGame(players, mapSize)
+        events.send(gameInitialized.toStartedEvent(), game.id.toString())
+        return initialize(startingPlayer, game, gameInitialized)
     }
 
     private suspend fun next(game: Game, lastMove: MoveTrigger): EndedGame =
@@ -32,8 +30,12 @@ class GameCoordinator(
             is EndedGame -> game
         }
 
-    private suspend fun initialize(startingPlayer: Identity, game: NewGame): EndedGame {
-        val initializationResults = initializePlayers(game)
+    private suspend fun initialize(
+        startingPlayer: Identity,
+        game: NewGame,
+        gameInitialized: GameInitialized
+    ): EndedGame {
+        val initializationResults = initializePlayers(game, gameInitialized)
         return when {
             initializationResults.allInitializedInTime() -> next(game.started(startingPlayer), FirstMove)
             initializationResults.allExceededTime() -> game.tie()
@@ -47,23 +49,32 @@ class GameCoordinator(
             ?.let { next(game.placed(it), OpponentMoved(it)) }
             ?: game.lost()
 
-    private suspend fun initializePlayers(game: NewGame): List<PlayerInitialized> = coroutineScope {
-        awaitAll(
-            async { init(algorithms.first, game) },
-            async { init(algorithms.second, game) }
-        )
-    }
+    private suspend fun initializePlayers(game: NewGame, gameInitialized: GameInitialized): List<PlayerInitialized> =
+        coroutineScope {
+            awaitAll(
+                async { init(algorithms.first, gameInitialized) },
+                async { init(algorithms.second, gameInitialized) }
+            )
+                .onEach { sendEvent(it, game) }
+        }
 
-    private suspend fun init(player: Algorithm, game: NewGame) =
-        withTimeoutOrNull(gameSettings.initTime) { player.initialize(game) }
-            ?.let { PlayerInitializedInTime(player.identity)
-                .also { events.send(PlayerInitializedEvent(game.id, player.identity), game.id.toString())} }
+    private suspend fun init(player: Algorithm, gameInitialized: GameInitialized) =
+        withTimeoutOrNull(gameSettings.initTime) { player.initialize(gameInitialized) }
+            ?.let { PlayerInitializedInTime(player.identity) }
             ?: PlayerExceededInitTimeout(player.identity)
-                .also { events.send(PlayerNotInitializedInTimeEvent(game.id, player.identity))}
 
-    private fun randomBlocks(mapSize: Int) =
-        (0..gameSettings.randomBricksAmount(mapSize))
-            .map { Block(Random.nextInt(mapSize), Random.nextInt(mapSize)) }
-            .toSet()
+    private fun sendEvent(playerInitialized: PlayerInitialized, game: Game) = when (playerInitialized) {
+        is PlayerInitializedInTime -> PlayerInitializedEvent(game.id, playerInitialized.player)
+        is PlayerExceededInitTimeout -> PlayerNotInitializedInTimeEvent(game.id, playerInitialized.player)
+    }
+        .let { events.send(it, game.id.toString()) }
 
 }
+
+private fun GameInitialized.toStartedEvent() =
+    GameStartedEvent(
+        gameId = gameId,
+        size = size,
+        players = players,
+        initialBlocks = initialBlocks
+    )

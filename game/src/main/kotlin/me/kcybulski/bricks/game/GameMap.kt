@@ -9,12 +9,6 @@ import me.kcybulski.bricks.game.PlacingError.CannotPlaceOutOfMap
 
 class GameMap private constructor(private val map: Array<Array<Field>>) {
 
-    val size = map.size
-
-    val blocks = map.flatMapIndexed { y, row ->
-        row.mapIndexedNotNull { x, f -> Block(x, y).takeIf { f is BlockField } }
-    }
-
     fun place(brick: Brick): Either<PlacingError, GameMap> = when {
         !isOnField(brick) -> CannotPlaceOutOfMap(brick).left()
         !isFree(brick) -> CannotPlaceOnTakenField(brick).left()

@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.GameCoordinator
 import me.kcybulski.bricks.game.GameSettings
+import me.kcybulski.bricks.game.GamesFactory
 import me.kcybulski.bricks.game.vs
 import me.kcybulski.bricks.test.TestAlgorithm
 import me.kcybulski.bricks.test.horizontal
@@ -17,15 +18,18 @@ class DuelSpec : ShouldSpec({
     val archer = TestAlgorithm("Archer")
     val ciril = TestAlgorithm("Ciril")
 
+    val settings = GameSettings(initTime = 10, moveTime = 10)
+
     val coordinator = GameCoordinator(
         archer vs ciril,
-        GameSettings(initTime = 10, moveTime = 10),
+        settings,
+        GamesFactory(settings),
         EventBus()
     )
 
     val duel = DuelCoordinator(coordinator, EventBus())
 
-    should("play take turns when playing duel") {
+    should("players take turns when playing duel") {
         //given
         archer.defaultMoveEither { horizontal(0, 0) }
         ciril.defaultMoveEither { horizontal(0, 0) }

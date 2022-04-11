@@ -1,11 +1,10 @@
 package me.kcybulski.bricks.server
 
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.runBlocking
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
+import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
 import me.kcybulski.bricks.server.lobby.Entrance
 import me.kcybulski.bricks.server.lobby.Healthchecker
@@ -24,6 +23,15 @@ fun main() = runBlocking {
 
     entrance.newLobby()
 
-    Server(entrance, tournaments, gameHistory, this).run { start() }
+    val server = Server(
+        entrance = entrance,
+        tournaments = tournaments,
+        gameHistories = gameHistory,
+        corsConfiguration = CorsConfiguration(),
+        coroutine = this
+    )
+
+    server.start()
+
     coroutineContext.job.join()
 }

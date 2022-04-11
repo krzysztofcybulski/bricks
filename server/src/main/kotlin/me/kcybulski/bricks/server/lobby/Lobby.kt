@@ -1,6 +1,5 @@
 package me.kcybulski.bricks.server.lobby
 
-import jdk.jfr.Registered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
