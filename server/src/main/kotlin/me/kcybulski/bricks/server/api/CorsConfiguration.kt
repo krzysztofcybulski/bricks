@@ -6,7 +6,7 @@ import java.lang.System.getenv
 
 class CorsConfiguration {
 
-    private val api = getProperty("FRONT_URL", "localhost:3000")
+    private val api = getenv("RATPACK_FRONT_URL") ?: "http://localhost:3000"
 
     fun addCORSHeaders(ctx: Context) = ctx
         .header("Access-Control-Allow-Origin", api)
