@@ -13,5 +13,4 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(project(":game"))
     implementation(project(":events"))
-    implementation("me.kcybulski.nexum:event-store:1.5.0")
 }
