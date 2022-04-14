@@ -7,8 +7,6 @@ data class AlgorithmsPair(
 
     fun players() = PlayersPair(first.identity, second.identity)
 
-    fun swap() = AlgorithmsPair(second, first)
-
     operator fun contains(identity: Identity) = first.identity == identity || second.identity == identity
 
     operator fun get(identity: Identity) = when (identity) {

@@ -8,13 +8,9 @@ import me.kcybulski.bricks.tournament.TournamentSettings
 import java.util.concurrent.Executors
 
 class Entrance(
-    private val lobbyFactory: LobbyFactory
+    private val lobbyFactory: LobbyFactory,
+    private val coroutineScope: CoroutineScope
 ) {
-
-    private val lobbiesScope = CoroutineScope(
-        Executors.newSingleThreadExecutor()
-            .asCoroutineDispatcher()
-    )
 
     private val lobbies: MutableMap<String, Lobby> = mutableMapOf()
 
@@ -26,18 +22,16 @@ class Entrance(
         lobbies[it.name] = it
     }
 
-    fun start(name: String, tournaments: TournamentFacade, settings: TournamentSettings): InGameLobby? {
+    suspend fun start(name: String, tournaments: TournamentFacade, settings: TournamentSettings): InGameLobby? {
         val lobby = lobbies[name]
         if (lobby !is OpenLobby) {
             return null
         }
         val inProgress = lobby.inProgress(tournaments, settings)
             .also { lobbies[name] = it }
-        lobbiesScope.launch {
-            inProgress
-                .run()
-                .also { lobbies[name] = it }
-        }
+        inProgress
+            .run()
+            .also { lobbies[name] = it }
         return inProgress
     }
 }

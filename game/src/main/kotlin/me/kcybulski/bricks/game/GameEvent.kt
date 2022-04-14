@@ -28,3 +28,14 @@ data class PlayerNotInitializedInTimeEvent(
     override val gameId: UUID,
     val player: Identity
 ): GameEvent
+
+data class GameEndedEvent(
+    override val gameId: UUID,
+    val result: GameResultEvent
+): GameEvent
+
+sealed class GameResultEvent
+
+object TieResult: GameResultEvent()
+
+data class GameWonResult(val player: Identity): GameResultEvent()

@@ -10,8 +10,10 @@ import me.kcybulski.bricks.game.GameCoordinator
 import me.kcybulski.bricks.game.GamesFactory
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.PlayersPair
+import java.util.UUID
 
 internal class Tournament(
+    val id: UUID,
     private val rounds: List<Round>,
     private val algorithms: List<Algorithm>,
     private val settings: TournamentSettings,
@@ -24,16 +26,15 @@ internal class Tournament(
     )
 
     private suspend fun playRound(round: Round): RoundResult = coroutineScope {
-        awaitAll(
-            *round.duels.map { async { playDuel(it) } }.toTypedArray()
-        )
-            .flatMap { it.games }
-            .let { RoundResult(it) }
+            round.duels.map { async { playDuel(it) } }
+            .awaitAll()
+            .flatMap(DuelResult::games)
+            .let(::RoundResult)
     }
 
     private suspend fun playDuel(duel: PlayersPair): DuelResult =
         GameCoordinator(duel.algorithmsPair(algorithms), settings.game, gamesFactory, events)
-            .let { DuelCoordinator(it, events) }
+            .let { DuelCoordinator(id, it, events) }
             .duel(*settings.mapSizesPerDuel.toIntArray())
 
 }

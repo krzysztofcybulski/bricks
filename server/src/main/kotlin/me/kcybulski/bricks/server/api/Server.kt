@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.server.api
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.kcybulski.bricks.gamehistory.GameEventsRenderer
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameMapRenderer
@@ -22,7 +23,7 @@ class Server(
     private val tournaments: TournamentFacade,
     private val gameHistories: GameHistoriesFacade,
     private val corsConfiguration: CorsConfiguration,
-    private val coroutine: CoroutineScope
+    private val coroutineScope: CoroutineScope
 ) {
 
     private val ratpackServer: RatpackServer = RatpackServer.of { server ->
@@ -45,7 +46,7 @@ class Server(
                     method
                         .get { _ ->
                             entrance.lobbies()
-                                .map(Lobby::toResponse)
+                                .map { it.toResponse(gameHistories) }
                                 .let { ctx.render(json(it)) }
                         }
                         .post { _ ->
@@ -57,14 +58,14 @@ class Server(
             }
             .get(":lobby") { ctx ->
                 entrance.lobby(ctx) { lobby ->
-                    lobby.toResponse()
+                    lobby.toResponse(gameHistories)
                         .let { ctx.render(json(it)) }
                 }
             }
             .get(":lobby/game") { ctx ->
                 entrance.lobby(ctx) { lobby ->
                     when (lobby) {
-                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(lobby, coroutine))
+                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(lobby, coroutineScope))
                         else -> ctx.response.status(400)
                     }
                 }
@@ -72,8 +73,12 @@ class Server(
             .post(":lobby/start") { ctx ->
                 entrance.lobby(ctx) { lobby ->
                     ctx.parse(fromJson(StartRequest::class.java))
-                        .map { entrance.start(lobby.name, tournaments, it.toSettings()) }
-                        .map { lobby.toResponse() }
+                        .map {
+                            coroutineScope.launch {
+                                entrance.start(lobby.name, tournaments, it.toSettings())
+                            }
+                        }
+                        .map { lobby.toResponse(gameHistories) }
                         .then { ctx.render(json(it)) }
                 }
             }

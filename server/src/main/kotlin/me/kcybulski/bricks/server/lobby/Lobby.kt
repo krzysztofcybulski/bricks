@@ -1,9 +1,6 @@
 package me.kcybulski.bricks.server.lobby
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult
@@ -12,10 +9,11 @@ import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.ReadyMessage
 import mu.KotlinLogging
 import ratpack.websocket.WebSocket
-import java.util.concurrent.Executors.newSingleThreadExecutor
+import java.util.UUID
 
 sealed class Lobby(
-    val name: String
+    val name: String,
+    val id: UUID
 ) {
 
     abstract fun playerNames(): List<String>
@@ -23,8 +21,9 @@ sealed class Lobby(
 }
 
 class OpenLobby(
-    name: String
-) : Lobby(name) {
+    name: String,
+    id: UUID
+) : Lobby(name, id) {
 
     private val logger = KotlinLogging.logger {}
     private val players: MutableList<PlayerConnection> = mutableListOf()
@@ -34,7 +33,8 @@ class OpenLobby(
         players += PlayerConnection(name, webSocket)
     }
 
-    fun inProgress(tournaments: TournamentFacade, settings: TournamentSettings) = InGameLobby(name, settings, players, tournaments)
+    fun inProgress(tournaments: TournamentFacade, settings: TournamentSettings) =
+        InGameLobby(name, id, settings, players, tournaments)
 
     override fun playerNames(): List<String> = players.map(PlayerConnection::name)
 
@@ -59,24 +59,19 @@ class OpenLobby(
 
 class InGameLobby(
     name: String,
+    id: UUID,
     private val settings: TournamentSettings,
     private val players: List<PlayerConnection>,
     private val tournaments: TournamentFacade
-) : Lobby(name) {
-
-    private val gameScope = CoroutineScope(
-        newSingleThreadExecutor()
-            .asCoroutineDispatcher()
-    )
+) : Lobby(name, id) {
 
     suspend fun run(): ClosedLobby =
-        withContext(gameScope.coroutineContext) {
-            ClosedLobby(
-                name,
-                tournaments.play(players, settings),
-                playerNames()
-            )
-        }
+        ClosedLobby(
+            name,
+            id,
+            tournaments.play(id, players, settings),
+            playerNames()
+        )
 
     override fun playerNames(): List<String> = players.map(PlayerConnection::name)
 
@@ -84,8 +79,9 @@ class InGameLobby(
 
 class ClosedLobby(
     name: String,
+    id: UUID,
     val result: TournamentResult,
     val playerNames: List<String>
-) : Lobby(name) {
+) : Lobby(name, id) {
     override fun playerNames(): List<String> = playerNames
 }

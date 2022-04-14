@@ -1,7 +1,8 @@
 package me.kcybulski.bricks.server.api
 
-import me.kcybulski.bricks.game.EndedGame
-import me.kcybulski.bricks.game.WonGame
+import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
+import me.kcybulski.bricks.gamehistory.GameState.ENDED
+import me.kcybulski.bricks.gamehistory.GameView
 import me.kcybulski.bricks.server.lobby.ClosedLobby
 import me.kcybulski.bricks.server.lobby.InGameLobby
 import me.kcybulski.bricks.server.lobby.Lobby
@@ -20,28 +21,32 @@ data class LobbyWithStateResponse(
 
 }
 
-fun Lobby.toResponse() = when (this) {
+fun Lobby.toResponse(gameHistoriesFacade: GameHistoriesFacade) = when (this) {
     is OpenLobby -> toResponse("OPEN")
-    is InGameLobby -> toResponse("IN_GAME")
-    is ClosedLobby -> toResponse("ENDED", result.games)
+    is InGameLobby -> toResponse("IN_GAME", gameHistoriesFacade.games(id))
+    is ClosedLobby -> toResponse("ENDED", gameHistoriesFacade.games(id))
 }
 
-private fun Lobby.toResponse(status: String, games: List<EndedGame> = emptyList()) =
+private fun Lobby.toResponse(status: String, games: List<GameView> = emptyList()) =
     LobbyWithStateResponse(
-        name,
-        playerNames(),
-        status,
-        games.map(EndedGame::toResponse)
+        name = name,
+        playerNames = playerNames(),
+        status = status,
+        games = games.map(GameView::toResponse)
     )
 
 data class EndedGameResponse(
     val id: String,
-    val winner: String,
-    val players: List<String>
+    val winner: String?,
+    val players: List<String>,
+    val size: Int,
+    val state: String
 )
 
-private fun EndedGame.toResponse() = EndedGameResponse(
+private fun GameView.toResponse() = EndedGameResponse(
     id = id.toString(),
-    winner = if (this is WonGame) winner.name else "TIE",
-    players = players.names().toList()
+    winner = if(state == ENDED) winner ?: "TIE" else null,
+    players = players.toList(),
+    size = size,
+    state = state.toString()
 )

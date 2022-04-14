@@ -17,11 +17,11 @@ class GameCoordinator(
 
     val players = algorithms.players()
 
-    suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame {
-        val (gameInitialized, game) = gamesFactory.createNewGame(players, mapSize)
-        events.send(gameInitialized.toStartedEvent(), game.id.toString())
-        return initialize(startingPlayer, game, gameInitialized)
-    }
+    suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame =
+        gamesFactory.createNewGame(players, mapSize)
+            .also { (gameInitialized, game) -> events.send(gameInitialized.toStartedEvent(), game.id.toString()) }
+            .let { (gameInitialized, game) -> initialize(startingPlayer, game, gameInitialized) }
+            .also { game -> events.send(game.toEndedEvent(), game.id.toString()) }
 
     private suspend fun next(game: Game, lastMove: MoveTrigger): EndedGame =
         when (game) {
@@ -77,4 +77,13 @@ private fun GameInitialized.toStartedEvent() =
         size = size,
         players = players,
         initialBlocks = initialBlocks
+    )
+
+private fun EndedGame.toEndedEvent() =
+    GameEndedEvent(
+        gameId = id,
+        result = when(this) {
+            is WonGame -> GameWonResult(winner)
+            is TiedGame -> TieResult
+        }
     )

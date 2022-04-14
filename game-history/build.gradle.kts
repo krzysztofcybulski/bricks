@@ -12,5 +12,6 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(project(":game"))
+    implementation(project(":tournament"))
     implementation(project(":events"))
 }

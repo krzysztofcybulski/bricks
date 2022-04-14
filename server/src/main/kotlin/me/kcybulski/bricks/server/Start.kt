@@ -15,7 +15,7 @@ import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 fun main() = runBlocking {
     val eventStore = InMemoryEventStore.create()
 
-    val entrance = Entrance(LobbyFactory())
+    val entrance = Entrance(LobbyFactory(), this)
     val tournaments = TournamentFacade(EventBus(eventStore))
     val gameHistory = GameHistoriesFacade(eventStore)
 
@@ -28,7 +28,7 @@ fun main() = runBlocking {
         tournaments = tournaments,
         gameHistories = gameHistory,
         corsConfiguration = CorsConfiguration(),
-        coroutine = this
+        coroutineScope = this
     )
 
     server.start()

@@ -27,7 +27,7 @@ class DuelSpec : ShouldSpec({
         EventBus()
     )
 
-    val duel = DuelCoordinator(coordinator, EventBus())
+    val duel = DuelCoordinator(coordinator)
 
     should("players take turns when playing duel") {
         //given
