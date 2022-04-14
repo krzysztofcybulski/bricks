@@ -2,6 +2,7 @@ package me.kcybulski.bricks.server.api
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import me.kcybulski.bricks.bots.Bots
 import me.kcybulski.bricks.gamehistory.GameEventsRenderer
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameMapRenderer
@@ -22,6 +23,7 @@ class Server(
     private val entrance: Entrance,
     private val tournaments: TournamentFacade,
     private val gameHistories: GameHistoriesFacade,
+    private val bots: Bots,
     private val corsConfiguration: CorsConfiguration,
     private val coroutineScope: CoroutineScope
 ) {
@@ -56,6 +58,12 @@ class Server(
                         }
                 }
             }
+            .get("bots") { ctx ->
+                bots.getBotNames()
+                    .map(::BotResponse)
+                    .let(::json)
+                    .let(ctx::render)
+            }
             .get(":lobby") { ctx ->
                 entrance.lobby(ctx) { lobby ->
                     lobby.toResponse(gameHistories)
@@ -66,6 +74,19 @@ class Server(
                 entrance.lobby(ctx) { lobby ->
                     when (lobby) {
                         is OpenLobby -> WebSockets.websocket(ctx, WSHandler(lobby, coroutineScope))
+                        else -> ctx.response.status(400)
+                    }
+                }
+            }
+            .post(":lobby/bots") { ctx ->
+                entrance.lobby(ctx) { lobby ->
+                    when (lobby) {
+                        is OpenLobby -> ctx
+                            .parse(fromJson(AddBotRequest::class.java))
+                            .map { bots.getAlgorithm(it.name) }
+                            .map { algorithm -> algorithm?.let { lobby.registerBot(it) } }
+                            .map { lobby.toResponse(gameHistories) }
+                            .then { ctx.render(json(it)) }
                         else -> ctx.response.status(400)
                     }
                 }

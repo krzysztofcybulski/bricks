@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.server.lobby
 
 import kotlinx.coroutines.coroutineScope
+import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult
@@ -26,34 +27,45 @@ class OpenLobby(
 ) : Lobby(name, id) {
 
     private val logger = KotlinLogging.logger {}
-    private val players: MutableList<PlayerConnection> = mutableListOf()
+    private val players: MutableList<Algorithm> = mutableListOf()
 
     fun registerPlayer(name: String, webSocket: WebSocket) {
         logger.info { "${this@OpenLobby.name} - Registered player $name" }
         players += PlayerConnection(name, webSocket)
     }
 
+    fun registerBot(algorithm: Algorithm) {
+        players += algorithm
+    }
+
     fun inProgress(tournaments: TournamentFacade, settings: TournamentSettings) =
         InGameLobby(name, id, settings, players, tournaments)
 
-    override fun playerNames(): List<String> = players.map(PlayerConnection::name)
+    override fun playerNames(): List<String> = players.map { it.identity.name }
 
     suspend fun ready(connection: WebSocket) {
-        players.find { it.webSocket == connection }?.channel?.send(ReadyMessage)
+        findWebsocket(connection)?.channel?.send(ReadyMessage)
     }
 
     suspend fun moved(connection: WebSocket, message: MoveMessage) {
-        players.find { it.webSocket == connection }?.channel?.send(message)
+        findWebsocket(connection)?.channel?.send(message)
     }
 
     suspend fun healthy(connection: WebSocket) {
-        players.find { it.webSocket == connection }?.healthChannel?.send(true)
+        findWebsocket(connection)?.healthChannel?.send(true)
     }
 
     suspend fun refresh() = coroutineScope {
-        val toRemove = players.filter { !it.isHealthy() }
+        val toRemove = players
+            .filterIsInstance<PlayerConnection>()
+            .filterNot { it.isHealthy() }
         players.removeAll(toRemove)
     }
+
+    private fun findWebsocket(connection: WebSocket) =
+        players
+            .filterIsInstance<PlayerConnection>()
+            .find { it.webSocket == connection }
 
 }
 
@@ -61,7 +73,7 @@ class InGameLobby(
     name: String,
     id: UUID,
     private val settings: TournamentSettings,
-    private val players: List<PlayerConnection>,
+    private val players: List<Algorithm>,
     private val tournaments: TournamentFacade
 ) : Lobby(name, id) {
 
@@ -73,7 +85,7 @@ class InGameLobby(
             playerNames()
         )
 
-    override fun playerNames(): List<String> = players.map(PlayerConnection::name)
+    override fun playerNames(): List<String> = players.map { it.identity.name }
 
 }
 

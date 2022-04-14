@@ -1,5 +1,6 @@
 package me.kcybulski.bricks.server.api
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.kcybulski.bricks.game.GameSettings
 import me.kcybulski.bricks.tournament.TournamentSettings
 
@@ -15,3 +16,7 @@ data class StartRequest(
     )
 
 }
+
+data class AddBotRequest(
+    @JsonProperty("name") val name: String
+)

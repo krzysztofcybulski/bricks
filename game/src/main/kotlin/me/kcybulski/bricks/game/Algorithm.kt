@@ -28,6 +28,7 @@ interface Algorithm {
 data class Identity(val name: String) {
 
     companion object {
-        fun default() = Identity(Faker().animal().name())
+        private val faker = Faker()
+        fun default() = Identity(faker.animal().name())
     }
 }

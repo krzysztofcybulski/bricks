@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":test"))
     implementation(project(":shared-web"))
     implementation(project(":game-history"))
+    implementation(project(":bots"))
     implementation(kotlin("stdlib"))
     implementation("me.kcybulski.nexum:event-store:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")

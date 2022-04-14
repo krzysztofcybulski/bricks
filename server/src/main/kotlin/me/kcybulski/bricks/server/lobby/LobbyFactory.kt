@@ -9,7 +9,7 @@ class LobbyFactory(
 
     fun create(): Lobby = OpenLobby(coolName(), randomUUID())
 
-    private fun coolName() = faker.dog().breed()
+    private fun coolName() = faker.beer().name()
         .lowercase()
         .replace(" ", "-")
 

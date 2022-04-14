@@ -43,9 +43,13 @@ data class EndedGameResponse(
     val state: String
 )
 
+data class BotResponse(
+    val name: String
+)
+
 private fun GameView.toResponse() = EndedGameResponse(
     id = id.toString(),
-    winner = if(state == ENDED) winner ?: "TIE" else null,
+    winner = if (state == ENDED) winner ?: "TIE" else null,
     players = players.toList(),
     size = size,
     state = state.toString()
