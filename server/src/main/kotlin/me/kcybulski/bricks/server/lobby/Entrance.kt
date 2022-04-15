@@ -1,15 +1,10 @@
 package me.kcybulski.bricks.server.lobby
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentSettings
-import java.util.concurrent.Executors
 
-class Entrance(
-    private val lobbyFactory: LobbyFactory,
-    private val coroutineScope: CoroutineScope
+class Entrance private constructor(
+    private val lobbyFactory: LobbyFactory
 ) {
 
     private val lobbies: MutableMap<String, Lobby> = mutableMapOf()
@@ -33,5 +28,16 @@ class Entrance(
             .run()
             .also { lobbies[name] = it }
         return inProgress
+    }
+
+    companion object {
+
+        fun createWithLobbies(lobbiesAmount: Int, lobbyFactory: LobbyFactory = LobbyFactory()): Entrance {
+            val entrance = Entrance(lobbyFactory)
+            repeat(lobbiesAmount) {
+                entrance.newLobby()
+            }
+            return entrance
+        }
     }
 }

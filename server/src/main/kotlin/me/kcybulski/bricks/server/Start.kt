@@ -16,21 +16,16 @@ import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 
 fun main() = runBlocking {
     val eventStore = InMemoryEventStore.create()
+    val eventBus = EventBus(eventStore)
 
-    val entrance = Entrance(LobbyFactory(), this)
-    val tournaments = TournamentFacade(EventBus(eventStore))
-    val gameHistory = GameHistoriesFacade(eventStore)
-    val bots = Bots()
-
-    Healthchecker(entrance).start()
-
-    entrance.newLobby()
+    val entrance = Entrance.createWithLobbies(1)
+    Healthchecker.startForEntrance(entrance)
 
     val server = Server(
         entrance = entrance,
-        tournaments = tournaments,
-        gameHistories = gameHistory,
-        bots = bots,
+        tournaments = TournamentFacade(eventBus),
+        gameHistories = GameHistoriesFacade(eventStore),
+        bots = Bots.allBots(),
         corsConfiguration = CorsConfiguration(),
         coroutineScope = this
     )

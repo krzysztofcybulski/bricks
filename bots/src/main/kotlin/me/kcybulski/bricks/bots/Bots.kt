@@ -17,6 +17,11 @@ class Bots {
             ?.algorithmProvider
             ?.invoke()
 
+    companion object {
+
+        fun allBots(): Bots = Bots()
+
+    }
 }
 
 internal class Bot(
