@@ -25,13 +25,16 @@ class Server(
     private val gameHistories: GameHistoriesFacade,
     private val bots: Bots,
     private val corsConfiguration: CorsConfiguration,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
+    private val port: Int? = null
 ) {
 
     private val ratpackServer: RatpackServer = RatpackServer.of { server ->
         server
             .serverConfig { config ->
-                config.threads(1)
+                config
+                    .port(port ?: 5050)
+                    .threads(1)
             }
             .handlers(api())
     }

@@ -9,10 +9,9 @@ import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
 import me.kcybulski.bricks.server.lobby.Entrance
 import me.kcybulski.bricks.server.lobby.Healthchecker
-import me.kcybulski.bricks.server.lobby.LobbyFactory
-import me.kcybulski.bricks.server.lobby.OpenLobby
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
+import java.lang.System.getenv
 
 fun main() = runBlocking {
     val eventStore = InMemoryEventStore.create()
@@ -27,7 +26,8 @@ fun main() = runBlocking {
         gameHistories = GameHistoriesFacade(eventStore),
         bots = Bots.allBots(),
         corsConfiguration = CorsConfiguration(),
-        coroutineScope = this
+        coroutineScope = this,
+        port = getenv("PORT").toInt()
     )
 
     server.start()
