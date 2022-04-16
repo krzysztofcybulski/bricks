@@ -1,9 +1,12 @@
 plugins {
     kotlin("jvm") version "1.6.0-RC"
+    `java-library`
+    `maven-publish`
+    signing
 }
 
 group = "me.kcybulski.bricks"
-version = "1.0-SNAPSHOT"
+version = "2.0"
 
 repositories {
     mavenCentral()
@@ -16,4 +19,43 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
     implementation("org.slf4j:slf4j-simple:2.0.0-alpha5")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "bricks-events"
+            version = "2.0"
+            pom {
+                name.set("bricks-events")
+                url.set("https://github.com/krzysztofcybulski/bricks")
+                description.set("Bricks events")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("krzysztofcybulski")
+                        name.set("Krzysztof Cybulski")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/krzysztofcybulski/bricks")
+                }
+            }
+        }
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }

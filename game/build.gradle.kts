@@ -1,9 +1,12 @@
 plugins {
     kotlin("jvm") version "1.6.0-M1"
+    `java-library`
+    `maven-publish`
+    signing
 }
 
 group = "me.kcybulski.bricks"
-version = "1.0-SNAPSHOT"
+version = "2.0"
 
 repositories {
     mavenCentral()
@@ -23,4 +26,43 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "bricks-game"
+            version = "2.0"
+            pom {
+                name.set("bricks-game")
+                url.set("https://github.com/krzysztofcybulski/bricks")
+                description.set("Bricks game")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("krzysztofcybulski")
+                        name.set("Krzysztof Cybulski")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/krzysztofcybulski/bricks")
+                }
+            }
+        }
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }
