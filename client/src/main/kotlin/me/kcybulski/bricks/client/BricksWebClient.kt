@@ -26,13 +26,19 @@ class BricksWebClient(host: String, port: Int = 80) {
 
     private val rest = RestBricksClient(httpClient, host, port)
 
-    suspend fun register(lobby: String, algorithm: Algorithm) {
+    suspend fun register(lobby: String, algorithm: UserAlgorithm) {
         websocket.connect(lobby, algorithm)
     }
 
-    suspend fun register(algorithm: Algorithm) {
+    suspend fun register(algorithm: UserAlgorithm) {
         val lobbies = rest.getLobbies()
             .filter { it.isOpen() }
+
+        if(lobbies.isEmpty()) {
+            println("No open lobbies found")
+            return
+        }
+
         println("Choose your lobby:")
         lobbies.forEachIndexed { i, lobby ->
             println("[$i] ${lobby.name}")

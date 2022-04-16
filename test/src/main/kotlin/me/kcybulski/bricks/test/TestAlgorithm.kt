@@ -30,13 +30,8 @@ class TestAlgorithm(
         return this
     }
 
-    fun nextMoveEither(move: suspend () -> Either<Any, Brick>): TestAlgorithm {
-        this.moves += { move().getOrElse { throw IllegalArgumentException("Invalid brick") } }
-        return this
-    }
-
-    fun defaultMoveEither(move: suspend () -> Either<Any, Brick>): TestAlgorithm {
-        this.defaultMove = { move().getOrElse { throw IllegalArgumentException("Invalid brick") } }
+    fun defaultMove(move: suspend () -> Brick): TestAlgorithm {
+        this.defaultMove = { move() }
         return this
     }
 

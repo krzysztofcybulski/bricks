@@ -10,6 +10,7 @@ import me.kcybulski.bricks.game.vs
 import me.kcybulski.bricks.test.TestAlgorithm
 import me.kcybulski.bricks.test.horizontal
 import me.kcybulski.bricks.tournament.assertions.DuelAssertions.Companion.assertThat
+import java.util.UUID.randomUUID
 
 class DuelSpec : ShouldSpec({
 
@@ -18,21 +19,31 @@ class DuelSpec : ShouldSpec({
     val archer = TestAlgorithm("Archer")
     val ciril = TestAlgorithm("Ciril")
 
-    val settings = GameSettings(initTime = 10, moveTime = 10)
+    val settings = GameSettings(
+        initTime = 10,
+        moveTime = 10,
+        randomBrickChance = 0.0
+    )
+
+    val events = EventBus()
 
     val coordinator = GameCoordinator(
         archer vs ciril,
         settings,
         GamesFactory(settings),
-        EventBus()
+        events
     )
 
-    val duel = DuelCoordinator(coordinator)
+    val duel = DuelCoordinator(
+        randomUUID(),
+        coordinator,
+        events
+    )
 
     should("players take turns when playing duel") {
         //given
-        archer.defaultMoveEither { horizontal(0, 0) }
-        ciril.defaultMoveEither { horizontal(0, 0) }
+        archer.defaultMove { horizontal(0, 0) }
+        ciril.defaultMove { horizontal(0, 0) }
 
         //when
         val duelResult = duel.duel(3, 5, 10)

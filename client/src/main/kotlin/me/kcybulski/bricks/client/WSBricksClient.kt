@@ -1,6 +1,5 @@
 package me.kcybulski.bricks.client
 
-import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -8,18 +7,18 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
 import me.kcybulski.bricks.game.Brick
 import me.kcybulski.bricks.game.DuoBrick
 import me.kcybulski.bricks.game.GameInitialized
-import me.kcybulski.bricks.game.GameMap
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
-import me.kcybulski.bricks.game.NewGame
 import me.kcybulski.bricks.game.PlayersPair
 import me.kcybulski.bricks.web.FirstMoveMessage
 import me.kcybulski.bricks.web.GameStartedMessage
@@ -41,7 +40,7 @@ internal class WSBricksClient(
 
     private val logger = KotlinLogging.logger {}
 
-    suspend fun connect(lobby: String, bricks: Algorithm) {
+    suspend fun connect(lobby: String, bricks: Algorithm) = withContext(SupervisorJob()) {
         http.webSocket(method = Get, host = host, port = port, path = "/${lobby}/game") {
             sendJson(RegisterMessage(bricks.identity.name))
             logger.info { "Registered as ${bricks.identity.name}" }
@@ -90,11 +89,11 @@ internal class WSBricksClient(
 
     private fun toMove(message: ServerMessage): MoveTrigger = when (message) {
         is MoveMessage -> MoveTrigger.OpponentMoved(
-            DuoBrick.of(
+            DuoBrick.unsafe(
                 Block(message.blocks[0].x, message.blocks[0].y),
                 Block(message.blocks[1].x, message.blocks[1].y)
             )
-                .getOrHandle { throw IllegalStateException("") })
+        )
         is FirstMoveMessage -> MoveTrigger.FirstMove
         else -> throw IllegalStateException("Unknown move!")
     }

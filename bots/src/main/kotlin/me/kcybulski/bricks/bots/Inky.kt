@@ -1,14 +1,11 @@
 package me.kcybulski.bricks.bots
 
-import arrow.core.Either
-import arrow.core.getOrHandle
 import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.Block
 import me.kcybulski.bricks.game.Brick
 import me.kcybulski.bricks.game.DuoBrick
 import me.kcybulski.bricks.game.GameInitialized
 import me.kcybulski.bricks.game.Identity
-import me.kcybulski.bricks.game.InvalidBrick
 import me.kcybulski.bricks.game.MoveTrigger
 
 class Inky : Algorithm {
@@ -21,8 +18,8 @@ class Inky : Algorithm {
         (0 until gameInitialized.size - 1)
             .forEach { y ->
                 (0 until gameInitialized.size - 1).forEach { x ->
-                    horizontal(x, y).tap { emptyPlaces += it }
-                    vertical(x, y).tap { emptyPlaces += it }
+                    horizontal(x, y).let { emptyPlaces += it }
+                    vertical(x, y).let { emptyPlaces += it }
                 }
             }
         gameInitialized
@@ -38,7 +35,7 @@ class Inky : Algorithm {
         return emptyPlaces
             .firstOrNull()
             ?.also(this::removeEveryWith)
-            ?: horizontal(0, 0).get()
+            ?: horizontal(0, 0)
     }
 
     private fun removeEveryWith(brick: Brick) {
@@ -46,10 +43,8 @@ class Inky : Algorithm {
     }
 }
 
-private fun <T> Either<InvalidBrick, T>.get() = getOrHandle { throw IllegalArgumentException() }
+private fun horizontal(x: Int, y: Int): Brick =
+    DuoBrick.unsafe(Block(x, y), Block(x + 1, y))
 
-private fun horizontal(x: Int, y: Int): Either<InvalidBrick, Brick> =
-    DuoBrick.of(Block(x, y), Block(x + 1, y))
-
-private fun vertical(x: Int, y: Int): Either<InvalidBrick, Brick> =
-    DuoBrick.of(Block(x, y), Block(x, y + 1))
+private fun vertical(x: Int, y: Int): Brick =
+    DuoBrick.unsafe(Block(x, y), Block(x, y + 1))

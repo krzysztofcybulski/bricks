@@ -1,22 +1,27 @@
 package me.kcybulski.bricks.game
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
-import me.kcybulski.bricks.game.InvalidBrick.InvalidBlocks
-import me.kcybulski.bricks.game.InvalidBrick.InvalidPosition
+import me.kcybulski.bricks.game.DuoBrickResult.InvalidBlocks
+import me.kcybulski.bricks.game.DuoBrickResult.InvalidPosition
 import kotlin.math.abs
 
 sealed class Brick(val blocks: List<Block>)
 
-class DuoBrick private constructor(blocks: List<Block>) : Brick(blocks) {
+class DuoBrick private constructor(blocks: List<Block>) : Brick(blocks), DuoBrickResult {
 
     companion object {
-        fun of(first: Block, second: Block): Either<InvalidBrick, Brick> = when {
-            !first.isNextTo(second) -> InvalidBlocks.left()
-            first.outOfMap() || second.outOfMap() -> InvalidPosition.left()
-            else -> DuoBrick(listOf(first, second)).right()
+
+        fun safe(first: Block, second: Block): DuoBrickResult = when {
+            !first.isNextTo(second) -> InvalidBlocks
+            first.outOfMap() || second.outOfMap() -> InvalidPosition
+            else -> DuoBrick(listOf(first, second))
         }
+
+        fun unsafe(first: Block, second: Block): DuoBrick =
+            safe(first, second)
+                .takeIf { it is DuoBrick }
+                ?.let { it as DuoBrick }
+                ?: throw IllegalArgumentException("Invalid block positions")
+
     }
 }
 
@@ -27,9 +32,9 @@ data class Block(val x: Int, val y: Int) {
     internal fun outOfMap() = x < 0 || y < 0
 }
 
-sealed class InvalidBrick {
+sealed interface DuoBrickResult {
 
-    object InvalidPosition : InvalidBrick()
-    object InvalidBlocks : InvalidBrick()
+    object InvalidPosition : DuoBrickResult
+    object InvalidBlocks : DuoBrickResult
 
 }

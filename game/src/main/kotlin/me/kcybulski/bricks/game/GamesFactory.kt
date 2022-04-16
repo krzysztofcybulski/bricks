@@ -19,7 +19,7 @@ class GamesFactory(
     }
 
     private fun randomBlocks(mapSize: Int) =
-        (0..gameSettings.randomBricksAmount(mapSize))
+        (0 until gameSettings.randomBricksAmount(mapSize))
             .map { Block(Random.nextInt(mapSize), Random.nextInt(mapSize)) }
             .toSet()
 }

@@ -17,7 +17,11 @@ class GameSpec : ShouldSpec({
     val archer = TestAlgorithm("Archer")
     val ciril = TestAlgorithm("Ciril")
 
-    val settings = GameSettings(initTime = 10, moveTime = 10, randomBrickChance = 1.0)
+    val settings = GameSettings(
+        initTime = 10,
+        moveTime = 10,
+        randomBrickChance = 0.0
+    )
 
     val coordinator = GameCoordinator(
         archer vs ciril,
@@ -30,7 +34,7 @@ class GameSpec : ShouldSpec({
 
     should("lose game when placed out of map") {
         //given
-        archer.nextMoveEither { horizontal(2, 1) }
+        archer.nextMove { horizontal(2, 1) }
 
         //when
         val endedGame = play()
@@ -41,11 +45,11 @@ class GameSpec : ShouldSpec({
 
     should("play game until placed invalid brick") {
         //given
-        archer.nextMoveEither { horizontal(0, 0) }
-        ciril.nextMoveEither { horizontal(0, 1) }
-        archer.nextMoveEither { horizontal(0, 2) }
-        ciril.nextMoveEither { vertical(2, 0) }
-        archer.nextMoveEither { vertical(2, 2) }
+        archer.nextMove { horizontal(0, 0) }
+        ciril.nextMove { horizontal(0, 1) }
+        archer.nextMove { horizontal(0, 2) }
+        ciril.nextMove { vertical(2, 0) }
+        archer.nextMove { vertical(2, 2) }
 
         //when
         val endedGame = play()
@@ -56,8 +60,8 @@ class GameSpec : ShouldSpec({
 
     should("lose game when placed on taken field") {
         //given
-        archer.nextMoveEither { horizontal(0, 0) }
-        ciril.nextMoveEither { horizontal(1, 0) }
+        archer.nextMove { horizontal(0, 0) }
+        ciril.nextMove { horizontal(1, 0) }
 
         //when
         val endedGame = play()
@@ -68,12 +72,10 @@ class GameSpec : ShouldSpec({
 
     should("play game until waited too long for move") {
         //given
-        archer.nextMoveEither { horizontal(0, 0) }
-        ciril.nextMoveEither {
-            coroutineScope {
-                delay(3000)
-                horizontal(0, 1)
-            }
+        archer.nextMove { horizontal(0, 0) }
+        ciril.nextMove {
+            delay(3000)
+            horizontal(0, 1)
         }
 
         //when

@@ -12,7 +12,6 @@ import me.kcybulski.bricks.game.DuoBrick
 import me.kcybulski.bricks.game.GameInitialized
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
-import me.kcybulski.bricks.game.NewGame
 import me.kcybulski.bricks.web.FirstMoveMessage
 import me.kcybulski.bricks.web.GameStartedMessage
 import me.kcybulski.bricks.web.HowAreYou
@@ -66,7 +65,7 @@ class PlayerConnection(
 
 }
 
-private fun MoveMessage.toBrick() = DuoBrick.of(
+private fun MoveMessage.toBrick() = DuoBrick.safe(
     Block(blocks[0].x, blocks[0].y),
     Block(blocks[1].x, blocks[1].y)
 ).getOrHandle { throw IllegalStateException() }
