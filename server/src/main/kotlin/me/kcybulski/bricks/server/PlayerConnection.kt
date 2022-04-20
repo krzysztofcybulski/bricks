@@ -65,7 +65,7 @@ class PlayerConnection(
 
 }
 
-private fun MoveMessage.toBrick() = DuoBrick.safe(
+private fun MoveMessage.toBrick() = DuoBrick.unsafe(
     Block(blocks[0].x, blocks[0].y),
     Block(blocks[1].x, blocks[1].y)
-).getOrHandle { throw IllegalStateException() }
+)
