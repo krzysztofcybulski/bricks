@@ -20,9 +20,7 @@ class Healthchecker private constructor(
 
     companion object {
 
-        suspend fun startForEntrance(entrance: Entrance) {
-            Healthchecker(entrance).start()
-        }
+        suspend fun startForEntrance(entrance: Entrance) = Healthchecker(entrance).start()
 
     }
 }

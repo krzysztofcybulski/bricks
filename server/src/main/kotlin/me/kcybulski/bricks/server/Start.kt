@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.server
 
 import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.kcybulski.bricks.bots.Bots
 import me.kcybulski.bricks.events.EventBus
@@ -18,7 +19,10 @@ fun main() = runBlocking {
     val eventBus = EventBus(eventStore)
 
     val entrance = Entrance.createWithLobbies(1)
-    Healthchecker.startForEntrance(entrance)
+
+    launch {
+        Healthchecker.startForEntrance(entrance)
+    }
 
     val server = Server(
         entrance = entrance,
