@@ -12,7 +12,7 @@ abstract class UserAlgorithm(
     suffix: String = ""
 ) : Algorithm {
 
-    override val identity = Identity("${getProperty("user.name")} $suffix")
+    override val identity = Identity("${getProperty("user.name")} $suffix".trim())
 
     override suspend fun move(last: MoveTrigger): Brick =
         when (last) {

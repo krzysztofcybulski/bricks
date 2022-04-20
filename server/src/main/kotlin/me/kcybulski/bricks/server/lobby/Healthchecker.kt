@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 
 class Healthchecker private constructor(
     private val entrance: Entrance,
-    private val healthcheckDelay: Long = 1000L
+    private val healthcheckDelay: Long = 2000L
 ) {
 
     suspend fun start() = coroutineScope {

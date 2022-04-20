@@ -1,6 +1,5 @@
 package me.kcybulski.bricks.server
 
-import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.channels.Channel
@@ -56,7 +55,7 @@ class PlayerConnection(
 
     suspend fun isHealthy(): Boolean {
         send(HowAreYou)
-        return withTimeoutOrNull(500) { healthChannel.receive() } ?: false
+        return withTimeoutOrNull(1000) { healthChannel.receive() } ?: false
     }
 
     private fun send(message: ServerMessage) {
