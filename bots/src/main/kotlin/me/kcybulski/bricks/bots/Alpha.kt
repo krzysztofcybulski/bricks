@@ -23,9 +23,9 @@ class Alpha : Algorithm {
                     emptyPlaces += vertical(x, y)
                 }
             }
-        (0 until gameInitialized.size - 2)
+        (0 until gameInitialized.size - 1)
             .forEach { x -> emptyPlaces += horizontal(x, gameInitialized.size - 1) }
-        (0 until gameInitialized.size - 2)
+        (0 until gameInitialized.size - 1)
             .forEach { y -> emptyPlaces += vertical(gameInitialized.size - 1, y) }
         gameInitialized
             .initialBlocks
