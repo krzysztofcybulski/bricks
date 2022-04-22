@@ -6,6 +6,6 @@ internal object BotNames {
 
     private val faker = Faker()
 
-    fun name(): String = "Bot ${faker.funnyName().name()}"
+    fun name(): String = "Bot ${faker.ancient().god()}"
 
 }

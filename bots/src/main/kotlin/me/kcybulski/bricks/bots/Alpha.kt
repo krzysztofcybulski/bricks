@@ -7,8 +7,9 @@ import me.kcybulski.bricks.game.DuoBrick
 import me.kcybulski.bricks.game.GameInitialized
 import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.MoveTrigger
+import me.kcybulski.bricks.game.MoveTrigger.OpponentMoved
 
-class Inky : Algorithm {
+class Alpha : Algorithm {
 
     private var emptyPlaces: MutableList<Brick> = mutableListOf()
 
@@ -18,10 +19,14 @@ class Inky : Algorithm {
         (0 until gameInitialized.size - 1)
             .forEach { y ->
                 (0 until gameInitialized.size - 1).forEach { x ->
-                    horizontal(x, y).let { emptyPlaces += it }
-                    vertical(x, y).let { emptyPlaces += it }
+                    emptyPlaces += horizontal(x, y)
+                    emptyPlaces += vertical(x, y)
                 }
             }
+        (0 until gameInitialized.size - 2)
+            .forEach { x -> emptyPlaces += horizontal(x, gameInitialized.size - 1) }
+        (0 until gameInitialized.size - 2)
+            .forEach { y -> emptyPlaces += vertical(gameInitialized.size - 1, y) }
         gameInitialized
             .initialBlocks
             .forEach { block -> emptyPlaces.removeIf { b -> block in b.blocks} }
@@ -29,7 +34,7 @@ class Inky : Algorithm {
     }
 
     override suspend fun move(last: MoveTrigger): Brick {
-        if (last is MoveTrigger.OpponentMoved) {
+        if (last is OpponentMoved) {
             removeEveryWith(last.brick)
         }
         return emptyPlaces

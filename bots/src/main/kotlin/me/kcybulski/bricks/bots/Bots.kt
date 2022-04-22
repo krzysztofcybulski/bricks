@@ -5,7 +5,7 @@ import me.kcybulski.bricks.game.Algorithm
 class Bots {
 
     private val bots = listOf(
-        Bot("Inky", ::Inky)
+        Bot("Alpha", ::Alpha)
     )
 
     fun getBotNames(): List<String> = bots
