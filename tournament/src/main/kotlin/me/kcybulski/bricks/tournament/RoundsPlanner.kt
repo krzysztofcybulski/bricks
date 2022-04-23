@@ -1,7 +1,7 @@
 package me.kcybulski.bricks.tournament
 
-import me.kcybulski.bricks.game.Identity
-import me.kcybulski.bricks.game.PlayersPair
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.PlayersPair
 
 internal object RoundsPlanner {
 

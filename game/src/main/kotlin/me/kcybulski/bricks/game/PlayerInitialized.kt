@@ -1,5 +1,7 @@
 package me.kcybulski.bricks.game
 
+import me.kcybulski.bricks.api.Identity
+
 sealed class PlayerInitialized(val player: Identity)
 
 class PlayerExceededInitTimeout(player: Identity) : PlayerInitialized(player)

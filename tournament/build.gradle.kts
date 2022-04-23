@@ -13,6 +13,7 @@ dependencies {
     api(project(":game"))
     api(project(":events"))
     implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
     testImplementation(project(":test"))
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.0.M3")

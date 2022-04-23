@@ -1,6 +1,6 @@
 package me.kcybulski.bricks.bots
 
-import me.kcybulski.bricks.game.Algorithm
+import me.kcybulski.bricks.api.Algorithm
 
 class Bots {
 
@@ -8,8 +8,7 @@ class Bots {
         Bot("Alpha", ::Alpha)
     )
 
-    fun getBotNames(): List<String> = bots
-        .map(Bot::name)
+    fun getBotNames(): List<String> = bots.map(Bot::name)
 
     fun getAlgorithm(name: String): Algorithm? =
         bots

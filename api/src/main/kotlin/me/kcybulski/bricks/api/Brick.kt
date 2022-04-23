@@ -1,7 +1,7 @@
-package me.kcybulski.bricks.game
+package me.kcybulski.bricks.api
 
-import me.kcybulski.bricks.game.DuoBrickResult.InvalidBlocks
-import me.kcybulski.bricks.game.DuoBrickResult.InvalidPosition
+import me.kcybulski.bricks.api.DuoBrickResult.InvalidBlocks
+import me.kcybulski.bricks.api.DuoBrickResult.InvalidPosition
 import kotlin.math.abs
 
 sealed class Brick(val blocks: List<Block>)

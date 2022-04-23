@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "me.kcybulski.bricks"
-version = "2.0"
+version = "2.1"
 
 repositories {
     mavenCentral()
@@ -14,9 +14,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    api(project(":api"))
     implementation(project(":events"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
-    api("io.arrow-kt:arrow-core:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("io.arrow-kt:arrow-core:1.0.0")
     implementation("com.github.javafaker:javafaker:1.0.2")
 
     testImplementation(project(":test"))
@@ -33,7 +34,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             artifactId = "bricks-game"
-            version = "2.0"
+            version = "2.1"
             pom {
                 name.set("bricks-game")
                 url.set("https://github.com/krzysztofcybulski/bricks")

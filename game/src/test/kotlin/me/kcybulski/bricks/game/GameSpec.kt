@@ -2,8 +2,8 @@ package me.kcybulski.bricks.game
 
 import io.kotest.core.spec.IsolationMode.InstancePerTest
 import io.kotest.core.spec.style.ShouldSpec
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.test.TestAlgorithm
 import me.kcybulski.bricks.test.assertions.GameAssertions.Companion.assertThat

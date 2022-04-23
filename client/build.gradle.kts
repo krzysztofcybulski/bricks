@@ -6,15 +6,14 @@ plugins {
 }
 
 group = "me.kcybulski.bricks"
-version = "2.0"
+version = "2.1"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    api(project(":game"))
-    api(project(":test"))
+    api(project(":api"))
     implementation(project(":events"))
     implementation(project(":shared-web"))
     implementation(kotlin("stdlib"))
@@ -35,7 +34,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             artifactId = "bricks-client"
-            version = "2.0"
+            version = "2.1"
             pom {
                 name.set("bricks-client")
                 url.set("https://github.com/krzysztofcybulski/bricks")

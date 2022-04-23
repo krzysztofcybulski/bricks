@@ -1,12 +1,11 @@
-package me.kcybulski.bricks.game
+package me.kcybulski.bricks.api
 
-import com.github.javafaker.Faker
 import java.util.UUID
 
 sealed class MoveTrigger {
 
     object FirstMove : MoveTrigger()
-    data class OpponentMoved(val brick: Brick): MoveTrigger()
+    data class OpponentMoved(val brick: Brick) : MoveTrigger()
 
 }
 
@@ -25,10 +24,4 @@ interface Algorithm {
 
 }
 
-data class Identity(val name: String) {
-
-    companion object {
-        private val faker = Faker()
-        fun default() = Identity(faker.animal().name())
-    }
-}
+data class Identity(val name: String)

@@ -1,7 +1,7 @@
 package me.kcybulski.bricks.test
 
-import me.kcybulski.bricks.game.Block
-import me.kcybulski.bricks.game.DuoBrick
+import me.kcybulski.bricks.api.Block
+import me.kcybulski.bricks.api.DuoBrick
 
 fun horizontal(x: Int, y: Int): DuoBrick =
     DuoBrick.unsafe(Block(x, y), Block(x + 1, y))

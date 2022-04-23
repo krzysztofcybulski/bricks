@@ -3,6 +3,8 @@ package me.kcybulski.bricks.game
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import me.kcybulski.bricks.api.Block
+import me.kcybulski.bricks.api.Brick
 import me.kcybulski.bricks.game.PlacingError.CannotPlaceInvalidBrick
 import me.kcybulski.bricks.game.PlacingError.CannotPlaceOnTakenField
 import me.kcybulski.bricks.game.PlacingError.CannotPlaceOutOfMap

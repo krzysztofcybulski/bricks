@@ -7,7 +7,6 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.jackson.jackson
-import me.kcybulski.bricks.game.Algorithm
 
 class BricksWebClient(host: String, port: Int = 80) {
 

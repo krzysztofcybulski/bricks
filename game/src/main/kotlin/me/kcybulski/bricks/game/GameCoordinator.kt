@@ -4,9 +4,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
+import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.api.GameInitialized
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.MoveTrigger
+import me.kcybulski.bricks.api.MoveTrigger.FirstMove
+import me.kcybulski.bricks.api.MoveTrigger.OpponentMoved
 import me.kcybulski.bricks.events.EventBus
-import me.kcybulski.bricks.game.MoveTrigger.FirstMove
-import me.kcybulski.bricks.game.MoveTrigger.OpponentMoved
 
 class GameCoordinator(
     private val algorithms: AlgorithmsPair,
@@ -82,7 +86,7 @@ private fun GameInitialized.toStartedEvent() =
 private fun EndedGame.toEndedEvent() =
     GameEndedEvent(
         gameId = id,
-        result = when(this) {
+        result = when (this) {
             is WonGame -> GameWonResult(winner)
             is TiedGame -> TieResult
         }

@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.game
+package me.kcybulski.bricks.api
 
 data class PlayersPair(
     val first: Identity,

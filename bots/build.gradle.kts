@@ -11,6 +11,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(project(":game"))
+    implementation(project(":api"))
     implementation("com.github.javafaker:javafaker:1.0.2")
 }

@@ -1,5 +1,9 @@
 package me.kcybulski.bricks.game
 
+import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.PlayersPair
+
 data class AlgorithmsPair(
     val first: Algorithm,
     val second: Algorithm

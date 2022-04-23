@@ -1,11 +1,11 @@
 package me.kcybulski.bricks.client
 
-import me.kcybulski.bricks.game.Algorithm
-import me.kcybulski.bricks.game.Brick
-import me.kcybulski.bricks.game.Identity
-import me.kcybulski.bricks.game.MoveTrigger
-import me.kcybulski.bricks.game.MoveTrigger.FirstMove
-import me.kcybulski.bricks.game.MoveTrigger.OpponentMoved
+import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.api.Brick
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.MoveTrigger
+import me.kcybulski.bricks.api.MoveTrigger.FirstMove
+import me.kcybulski.bricks.api.MoveTrigger.OpponentMoved
 import java.lang.System.getProperty
 
 abstract class UserAlgorithm(

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.0-RC"
+    kotlin("jvm") version "1.6.20"
     `java-library`
     `maven-publish`
     signing
@@ -14,23 +14,18 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    api("me.kcybulski.nexum:event-store:1.5.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
-    implementation("org.slf4j:slf4j-simple:2.0.0-alpha5")
 }
 
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "bricks-events"
+            artifactId = "bricks-api"
             version = "2.1"
             pom {
-                name.set("bricks-events")
+                name.set("bricks-api")
                 url.set("https://github.com/krzysztofcybulski/bricks")
-                description.set("Bricks events")
+                description.set("Bricks API")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")

@@ -1,7 +1,7 @@
 package me.kcybulski.bricks.server.lobby
 
 import kotlinx.coroutines.coroutineScope
-import me.kcybulski.bricks.game.Algorithm
+import me.kcybulski.bricks.api.Algorithm
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult

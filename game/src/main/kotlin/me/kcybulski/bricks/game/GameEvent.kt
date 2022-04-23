@@ -1,5 +1,9 @@
 package me.kcybulski.bricks.game
 
+import me.kcybulski.bricks.api.Block
+import me.kcybulski.bricks.api.Brick
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.PlayersPair
 import java.util.UUID
 
 interface GameEvent {
@@ -11,31 +15,31 @@ data class GameStartedEvent(
     val size: Int,
     val players: PlayersPair,
     val initialBlocks: Set<Block>
-): GameEvent
+) : GameEvent
 
 data class PlayerMovedEvent(
     override val gameId: UUID,
     val player: Identity,
     val brick: Brick
-): GameEvent
+) : GameEvent
 
 data class PlayerInitializedEvent(
     override val gameId: UUID,
     val player: Identity
-): GameEvent
+) : GameEvent
 
 data class PlayerNotInitializedInTimeEvent(
     override val gameId: UUID,
     val player: Identity
-): GameEvent
+) : GameEvent
 
 data class GameEndedEvent(
     override val gameId: UUID,
     val result: GameResultEvent
-): GameEvent
+) : GameEvent
 
 sealed class GameResultEvent
 
-object TieResult: GameResultEvent()
+object TieResult : GameResultEvent()
 
-data class GameWonResult(val player: Identity): GameResultEvent()
+data class GameWonResult(val player: Identity) : GameResultEvent()

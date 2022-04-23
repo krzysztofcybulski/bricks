@@ -9,8 +9,9 @@ class LobbyFactory(
 
     fun create(): Lobby = OpenLobby(coolName(), randomUUID())
 
-    private fun coolName() = faker.beer().name()
+    private fun coolName() = faker.food().dish()
         .lowercase()
         .replace(" ", "-")
+        .filter { it.isLetter() || it == '-' }
 
 }

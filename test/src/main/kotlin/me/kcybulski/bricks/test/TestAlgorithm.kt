@@ -1,14 +1,12 @@
 package me.kcybulski.bricks.test
 
-import arrow.core.Either
-import arrow.core.getOrElse
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import me.kcybulski.bricks.game.Algorithm
-import me.kcybulski.bricks.game.Brick
-import me.kcybulski.bricks.game.GameInitialized
-import me.kcybulski.bricks.game.Identity
-import me.kcybulski.bricks.game.MoveTrigger
+import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.api.Brick
+import me.kcybulski.bricks.api.GameInitialized
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.MoveTrigger
 
 class TestAlgorithm(
     name: String

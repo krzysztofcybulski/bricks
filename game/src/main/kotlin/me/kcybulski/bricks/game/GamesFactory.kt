@@ -1,5 +1,8 @@
 package me.kcybulski.bricks.game
 
+import me.kcybulski.bricks.api.Block
+import me.kcybulski.bricks.api.GameInitialized
+import me.kcybulski.bricks.api.PlayersPair
 import java.util.UUID.randomUUID
 import kotlin.random.Random
 

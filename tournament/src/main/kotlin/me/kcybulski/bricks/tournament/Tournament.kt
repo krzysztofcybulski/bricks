@@ -3,13 +3,13 @@ package me.kcybulski.bricks.tournament
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.PlayersPair
 import me.kcybulski.bricks.events.EventBus
-import me.kcybulski.bricks.game.Algorithm
 import me.kcybulski.bricks.game.AlgorithmsPair
 import me.kcybulski.bricks.game.GameCoordinator
 import me.kcybulski.bricks.game.GamesFactory
-import me.kcybulski.bricks.game.Identity
-import me.kcybulski.bricks.game.PlayersPair
 import java.util.UUID
 
 internal class Tournament(
@@ -26,7 +26,7 @@ internal class Tournament(
     )
 
     private suspend fun playRound(round: Round): RoundResult = coroutineScope {
-            round.duels.map { async { playDuel(it) } }
+        round.duels.map { async { playDuel(it) } }
             .awaitAll()
             .flatMap(DuelResult::games)
             .let(::RoundResult)

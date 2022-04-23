@@ -1,5 +1,8 @@
 package me.kcybulski.bricks.game
 
+import me.kcybulski.bricks.api.Brick
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.PlayersPair
 import java.util.UUID
 import java.util.UUID.randomUUID
 

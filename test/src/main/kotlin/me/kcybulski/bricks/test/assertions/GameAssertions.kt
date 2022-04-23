@@ -3,17 +3,10 @@ package me.kcybulski.bricks.test.assertions
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import me.kcybulski.bricks.game.Game
-import me.kcybulski.bricks.game.Identity
 import me.kcybulski.bricks.game.TiedGame
 import me.kcybulski.bricks.game.WonGame
 
 class GameAssertions private constructor(private val game: Game) {
-
-    fun wonBy(player: Identity): GameAssertions {
-        game.shouldBeInstanceOf<WonGame>()
-        game.winner shouldBe player
-        return this
-    }
 
     fun wonBy(player: String): GameAssertions {
         game.shouldBeInstanceOf<WonGame>()

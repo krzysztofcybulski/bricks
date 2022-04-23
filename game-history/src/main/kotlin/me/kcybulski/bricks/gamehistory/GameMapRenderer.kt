@@ -1,7 +1,7 @@
 package me.kcybulski.bricks.gamehistory
 
-import me.kcybulski.bricks.game.Identity
-import me.kcybulski.bricks.game.PlayersPair
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.api.PlayersPair
 import me.kcybulski.bricks.gamehistory.MapBlock.Empty
 import me.kcybulski.bricks.gamehistory.MapBlock.Taken
 import kotlin.math.absoluteValue
