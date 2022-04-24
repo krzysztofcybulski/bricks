@@ -21,9 +21,12 @@ internal class Tournament(
     private val events: EventBus
 ) {
 
-    suspend fun playTournament(): TournamentResult = TournamentResult(
-        rounds.flatMap { playRound(it).games }
-    )
+    suspend fun playTournament(): TournamentResult {
+        events.send(TournamentStarted(id))
+        val result = TournamentResult(rounds.flatMap { playRound(it).games })
+        events.send(TournamentEnded(id))
+        return result
+    }
 
     private suspend fun playRound(round: Round): RoundResult = coroutineScope {
         round.duels.map { async { playDuel(it) } }

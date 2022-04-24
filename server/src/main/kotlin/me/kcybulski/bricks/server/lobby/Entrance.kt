@@ -1,10 +1,12 @@
 package me.kcybulski.bricks.server.lobby
 
+import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentSettings
 
-class Entrance private constructor(
-    private val lobbyFactory: LobbyFactory
+class Entrance(
+    private val lobbyFactory: LobbyFactory,
+    private val eventBus: EventBus
 ) {
 
     private val lobbies: MutableMap<String, Lobby> = mutableMapOf()
@@ -13,9 +15,10 @@ class Entrance private constructor(
 
     operator fun get(name: String) = lobbies[name]
 
-    fun newLobby(): Lobby = lobbyFactory.create().also {
-        lobbies[it.name] = it
-    }
+    fun newLobby(): Lobby =
+        lobbyFactory.create()
+            .also { lobbies[it.name] = it }
+            .also { eventBus.send(LobbyAdded(it.name, it.id)) }
 
     suspend fun start(name: String, tournaments: TournamentFacade, settings: TournamentSettings): InGameLobby? {
         val lobby = lobbies[name]
@@ -28,16 +31,5 @@ class Entrance private constructor(
             .run()
             .also { lobbies[name] = it }
         return inProgress
-    }
-
-    companion object {
-
-        fun createWithLobbies(lobbiesAmount: Int, lobbyFactory: LobbyFactory = LobbyFactory()): Entrance {
-            val entrance = Entrance(lobbyFactory)
-            repeat(lobbiesAmount) {
-                entrance.newLobby()
-            }
-            return entrance
-        }
     }
 }

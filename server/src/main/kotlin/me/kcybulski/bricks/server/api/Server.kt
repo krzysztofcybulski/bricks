@@ -49,14 +49,14 @@ class Server(
             .prefix("lobbies") { lobbiesApi(it) }
             .prefix("games/:gameId") { gameChain ->
                 gameChain
-                    .get("games/:gameId/events") { ctx ->
+                    .get("events") { ctx ->
                         gameHistories.game(ctx.gameId)
                             .getAllEvents()
                             .map(GameEventsRenderer::toEventResponse)
                             .let(::json)
                             .let(ctx::render)
                     }
-                    .get("games/:gameId/:time?") { ctx ->
+                    .get(":time?") { ctx ->
                         gameHistories.game(ctx.gameId)
                             .at(ctx.gameTime)
                             ?.let(GameMapRenderer::toString)
@@ -86,7 +86,7 @@ class Server(
                 }
             }
             .get("updates") { ctx ->
-                WebSockets.websocketBroadcast(ctx, refreshLobbies.publisher())
+                WebSockets.websocket(ctx, refreshLobbies)
             }
             .prefix(":lobby") { lobbyChain ->
                 lobbyChain
@@ -137,7 +137,7 @@ private fun Entrance.lobby(ctx: Context, handler: (Lobby) -> Unit) = get(ctx.all
     ?.let { handler(it) }
     ?: ctx.notFound()
 
-private val Context.gameId get() = UUID.fromString(pathTokens["gameId"]!!)
+private val Context.gameId get() = UUID.fromString(allPathTokens["gameId"]!!)
 
 private val Context.gameTime get() = pathTokens["time"]?.toInt() ?: 10000
 

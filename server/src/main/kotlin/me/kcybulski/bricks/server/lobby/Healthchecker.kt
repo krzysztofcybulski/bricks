@@ -25,7 +25,8 @@ class Healthchecker private constructor(
         val healthStatuses = openLobby.getHealthStatuses()
         healthStatuses
             .filterValues { it is Healthy }
-            .let { connections ->
+            .takeIf { it.isNotEmpty() }
+            ?.let { connections ->
                 refreshLobbies.reportPing(
                     connections
                         .map { (k, v) -> k.identity to (v as Healthy).answerInMillis }

@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.server.lobby
 
 import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.server.HealthStatus
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
@@ -23,7 +24,8 @@ sealed class Lobby(
 
 class OpenLobby(
     name: String,
-    id: UUID
+    id: UUID,
+    private val eventBus: EventBus
 ) : Lobby(name, id) {
 
     private val logger = KotlinLogging.logger {}
@@ -32,10 +34,12 @@ class OpenLobby(
     fun registerPlayer(name: String, webSocket: WebSocket) {
         logger.info { "${this@OpenLobby.name} - Registered player $name" }
         players += PlayerConnection(name, webSocket)
+        eventBus.send(PlayerJoinedToLobby(this@OpenLobby.name, id, name), id.toString())
     }
 
     fun registerBot(algorithm: Algorithm) {
         players += algorithm
+        eventBus.send(PlayerJoinedToLobby(name, id, algorithm.identity.name), id.toString())
     }
 
     fun inProgress(tournaments: TournamentFacade, settings: TournamentSettings) =
@@ -62,6 +66,7 @@ class OpenLobby(
 
     suspend fun kick(playerConnection: PlayerConnection) {
         players.remove(playerConnection)
+        eventBus.send(PlayerLeftLobby(name, id, playerConnection.identity.name), id.toString())
     }
 
     private fun findWebsocket(connection: WebSocket) =

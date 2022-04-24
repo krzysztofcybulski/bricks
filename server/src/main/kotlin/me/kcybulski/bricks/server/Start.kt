@@ -10,6 +10,7 @@ import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
 import me.kcybulski.bricks.server.lobby.Entrance
 import me.kcybulski.bricks.server.lobby.Healthchecker
+import me.kcybulski.bricks.server.lobby.LobbyFactory
 import me.kcybulski.bricks.server.lobby.RefreshLobbies
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
@@ -19,8 +20,8 @@ fun main() = runBlocking {
     val eventStore = InMemoryEventStore.create()
     val eventBus = EventBus(eventStore)
 
-    val entrance = Entrance.createWithLobbies(1)
-    val refreshLobbies = RefreshLobbies(eventStore)
+    val entrance = Entrance(LobbyFactory(eventBus), eventBus).also { it.newLobby() }
+    val refreshLobbies = RefreshLobbies(eventStore, this)
 
     launch {
         Healthchecker.startForEntrance(entrance, refreshLobbies)
