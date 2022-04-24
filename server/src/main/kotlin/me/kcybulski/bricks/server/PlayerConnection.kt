@@ -3,6 +3,7 @@ package me.kcybulski.bricks.server
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.withTimeoutOrNull
 import me.kcybulski.bricks.api.Algorithm
 import me.kcybulski.bricks.api.Block
@@ -28,8 +29,8 @@ class PlayerConnection(
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {
 
-    val healthChannel = Channel<Boolean>()
-    val channel = Channel<UserMessage>()
+    val healthChannel = Channel<Boolean>(UNLIMITED)
+    val channel = Channel<UserMessage>(UNLIMITED)
 
     override val identity: Identity = Identity(name)
 
