@@ -20,9 +20,10 @@ import me.kcybulski.bricks.web.ReadyMessage
 import me.kcybulski.bricks.web.ServerMessage
 import me.kcybulski.bricks.web.UserMessage
 import ratpack.websocket.WebSocket
+import java.lang.System.currentTimeMillis
 
 class PlayerConnection(
-    val name: String,
+    name: String,
     val webSocket: WebSocket,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {
@@ -53,9 +54,12 @@ class PlayerConnection(
         return (channel.receive() as MoveMessage).toBrick()
     }
 
-    suspend fun isHealthy(): Boolean {
+    suspend fun healthStatus(): HealthStatus {
         send(HowAreYou)
-        return withTimeoutOrNull(1000) { healthChannel.receive() } ?: false
+        val time = currentTimeMillis()
+        return withTimeoutOrNull(1000) { healthChannel.receive() }
+            ?.let { Healthy(currentTimeMillis() - time) }
+            ?: NotHealthy
     }
 
     private fun send(message: ServerMessage) {
@@ -68,3 +72,9 @@ private fun MoveMessage.toBrick() = DuoBrick.unsafe(
     Block(blocks[0].x, blocks[0].y),
     Block(blocks[1].x, blocks[1].y)
 )
+
+sealed class HealthStatus
+
+object NotHealthy : HealthStatus()
+
+class Healthy(val answerInMillis: Long) : HealthStatus()

@@ -20,6 +20,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("me.kcybulski.nexum:event-store:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.5.2")
     implementation("io.github.microutils:kotlin-logging:1.12.5")
     implementation("org.slf4j:slf4j-simple:2.0.0-alpha5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")

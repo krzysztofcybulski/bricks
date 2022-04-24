@@ -10,6 +10,7 @@ import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
 import me.kcybulski.bricks.server.lobby.Entrance
 import me.kcybulski.bricks.server.lobby.Healthchecker
+import me.kcybulski.bricks.server.lobby.RefreshLobbies
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 import java.lang.System.getenv
@@ -19,9 +20,10 @@ fun main() = runBlocking {
     val eventBus = EventBus(eventStore)
 
     val entrance = Entrance.createWithLobbies(1)
+    val refreshLobbies = RefreshLobbies(eventStore)
 
     launch {
-        Healthchecker.startForEntrance(entrance)
+        Healthchecker.startForEntrance(entrance, refreshLobbies)
     }
 
     val server = Server(
@@ -31,10 +33,10 @@ fun main() = runBlocking {
         bots = Bots.allBots(),
         corsConfiguration = CorsConfiguration(),
         coroutineScope = this,
+        refreshLobbies = refreshLobbies,
         port = getenv("PORT").toInt()
     )
 
     server.start()
-
     coroutineContext.job.join()
 }

@@ -9,6 +9,7 @@ import me.kcybulski.bricks.gamehistory.GameMapRenderer
 import me.kcybulski.bricks.server.lobby.Entrance
 import me.kcybulski.bricks.server.lobby.Lobby
 import me.kcybulski.bricks.server.lobby.OpenLobby
+import me.kcybulski.bricks.server.lobby.RefreshLobbies
 import me.kcybulski.bricks.tournament.TournamentFacade
 import ratpack.func.Action
 import ratpack.handling.Chain
@@ -26,6 +27,7 @@ class Server(
     private val bots: Bots,
     private val corsConfiguration: CorsConfiguration,
     private val coroutineScope: CoroutineScope,
+    private val refreshLobbies: RefreshLobbies,
     private val port: Int? = null
 ) {
 
@@ -41,66 +43,10 @@ class Server(
 
     fun start() = ratpackServer.start()
 
-    fun stop() = ratpackServer.stop()
-
     private fun api(): Action<Chain> = Action { chain: Chain ->
         chain
             .all(corsConfiguration::addCORSHeaders)
-            .prefix("lobbies") { lobbiesChain ->
-                lobbiesChain
-                    .get { ctx ->
-                        entrance.lobbies()
-                            .map { it.toResponse(gameHistories) }
-                            .let { ctx.render(json(it)) }
-                    }
-                    .post { ctx ->
-                        entrance.newLobby().let {
-                            ctx.render(json(it))
-                        }
-                    }
-                    .prefix(":lobby") { lobbyChain ->
-                        lobbyChain
-                            .get { ctx ->
-                                entrance.lobby(ctx) { lobby ->
-                                    lobby.toResponse(gameHistories)
-                                        .renderJson(ctx)
-                                }
-                            }
-                            .get("game") { ctx ->
-                                entrance.lobby(ctx) { lobby ->
-                                    when (lobby) {
-                                        is OpenLobby -> WebSockets.websocket(ctx, WSHandler(lobby, coroutineScope))
-                                        else -> ctx.response.status(400)
-                                    }
-                                }
-                            }
-                            .post("tournaments") { ctx ->
-                                entrance.lobby(ctx) { lobby ->
-                                    ctx.parse(fromJson(StartRequest::class.java))
-                                        .map {
-                                            coroutineScope.launch {
-                                                entrance.start(lobby.name, tournaments, it.toSettings())
-                                            }
-                                        }
-                                        .map { lobby.toResponse(gameHistories) }
-                                        .then { ctx.render(json(it)) }
-                                }
-                            }
-                            .post("bots") { ctx ->
-                                entrance.lobby(ctx) { lobby ->
-                                    when (lobby) {
-                                        is OpenLobby -> ctx
-                                            .parse(fromJson(AddBotRequest::class.java))
-                                            .map { bots.getAlgorithm(it.name) }
-                                            .map { algorithm -> algorithm?.let { lobby.registerBot(it) } }
-                                            .map { lobby.toResponse(gameHistories) }
-                                            .then { ctx.render(json(it)) }
-                                        else -> ctx.response.status(400)
-                                    }
-                                }
-                            }
-                    }
-            }
+            .prefix("lobbies") { lobbiesApi(it) }
             .prefix("games/:gameId") { gameChain ->
                 gameChain
                     .get("games/:gameId/events") { ctx ->
@@ -124,11 +70,70 @@ class Server(
                     .let(::json)
                     .let(ctx::render)
             }
+            .let { lobbiesApi(it) }
     }
+
+    private fun lobbiesApi(lobbiesChain: Chain) =
+        lobbiesChain
+            .path { ctx ->
+                ctx.byMethod { m ->
+                    m.get { c ->
+                        entrance.lobbies()
+                            .map { it.toResponse(gameHistories) }
+                            .renderJson(c)
+                    }
+                        .post { c -> entrance.newLobby().renderJson(c) }
+                }
+            }
+            .get("updates") { ctx ->
+                WebSockets.websocketBroadcast(ctx, refreshLobbies.publisher())
+            }
+            .prefix(":lobby") { lobbyChain ->
+                lobbyChain
+                    .get { ctx ->
+                        entrance.lobby(ctx) { lobby ->
+                            lobby.toResponse(gameHistories)
+                                .renderJson(ctx)
+                        }
+                    }
+                    .get("game") { ctx ->
+                        entrance.lobby(ctx) { lobby ->
+                            when (lobby) {
+                                is OpenLobby -> WebSockets.websocket(ctx, WSHandler(lobby, coroutineScope))
+                                else -> ctx.response.status(400)
+                            }
+                        }
+                    }
+                    .post("tournaments") { ctx ->
+                        entrance.lobby(ctx) { lobby ->
+                            ctx.parse(fromJson(StartRequest::class.java))
+                                .map {
+                                    coroutineScope.launch {
+                                        entrance.start(lobby.name, tournaments, it.toSettings())
+                                    }
+                                }
+                                .map { lobby.toResponse(gameHistories) }
+                                .then { it.renderJson(ctx) }
+                        }
+                    }
+                    .post("bots") { ctx ->
+                        entrance.lobby(ctx) { lobby ->
+                            when (lobby) {
+                                is OpenLobby -> ctx
+                                    .parse(fromJson(AddBotRequest::class.java))
+                                    .map { bots.getAlgorithm(it.name) }
+                                    .map { algorithm -> algorithm?.let { lobby.registerBot(it) } }
+                                    .map { lobby.toResponse(gameHistories) }
+                                    .then { it.renderJson(ctx) }
+                                else -> ctx.response.status(400)
+                            }
+                        }
+                    }
+            }
 
 }
 
-private fun Entrance.lobby(ctx: Context, handler: (Lobby) -> Unit) = get(ctx.pathTokens["lobby"]!!)
+private fun Entrance.lobby(ctx: Context, handler: (Lobby) -> Unit) = get(ctx.allPathTokens["lobby"]!!)
     ?.let { handler(it) }
     ?: ctx.notFound()
 

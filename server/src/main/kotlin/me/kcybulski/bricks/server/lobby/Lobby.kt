@@ -1,7 +1,7 @@
 package me.kcybulski.bricks.server.lobby
 
-import kotlinx.coroutines.coroutineScope
 import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.server.HealthStatus
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.tournament.TournamentFacade
 import me.kcybulski.bricks.tournament.TournamentResult
@@ -55,11 +55,13 @@ class OpenLobby(
         findWebsocket(connection)?.healthChannel?.send(true)
     }
 
-    suspend fun refresh() = coroutineScope {
-        val toRemove = players
+    suspend fun getHealthStatuses(): Map<PlayerConnection, HealthStatus> =
+        players
             .filterIsInstance<PlayerConnection>()
-            .filterNot { it.isHealthy() }
-        players.removeAll(toRemove)
+            .associateWith { it.healthStatus() }
+
+    suspend fun kick(playerConnection: PlayerConnection) {
+        players.remove(playerConnection)
     }
 
     private fun findWebsocket(connection: WebSocket) =
