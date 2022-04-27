@@ -2,6 +2,7 @@ package me.kcybulski.bricks.server.lobby
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.kcybulski.bricks.server.Healthy
 import me.kcybulski.bricks.server.NotHealthy
 
@@ -40,8 +41,11 @@ class Healthchecker private constructor(
 
     companion object {
 
-        suspend fun startForEntrance(entrance: Entrance, refreshLobbies: RefreshLobbies) =
-            Healthchecker(entrance, refreshLobbies).start()
+        suspend fun startForEntrance(entrance: Entrance, refreshLobbies: RefreshLobbies) = coroutineScope {
+            launch {
+                Healthchecker(entrance, refreshLobbies).start()
+            }
+        }
 
     }
 }

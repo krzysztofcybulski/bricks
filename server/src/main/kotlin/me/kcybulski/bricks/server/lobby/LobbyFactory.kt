@@ -1,19 +1,18 @@
 package me.kcybulski.bricks.server.lobby
 
-import com.github.javafaker.Faker
 import me.kcybulski.bricks.events.EventBus
 import java.util.UUID.randomUUID
 
 class LobbyFactory(
     private val eventBus: EventBus,
-    private val faker: Faker = Faker()
+    private val nameGenerator: () -> String
 ) {
 
     fun create(): Lobby = OpenLobby(coolName(), randomUUID(), eventBus)
 
-    private fun coolName() = faker.food().dish()
+    private fun coolName() = nameGenerator()
         .lowercase()
         .replace(" ", "-")
-        .filter { it.isLetter() || it == '-' }
+        .filter { it.isLetterOrDigit() || it == '-' }
 
 }

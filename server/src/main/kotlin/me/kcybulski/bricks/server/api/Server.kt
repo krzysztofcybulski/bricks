@@ -31,7 +31,7 @@ class Server(
     private val port: Int? = null
 ) {
 
-    private val ratpackServer: RatpackServer = RatpackServer.of { server ->
+    val ratpackServer: RatpackServer = RatpackServer.of { server ->
         server
             .serverConfig { config ->
                 config
