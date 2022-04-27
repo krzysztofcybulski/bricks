@@ -2,10 +2,12 @@ package me.kcybulski.bricks.bots
 
 import me.kcybulski.bricks.api.Algorithm
 
-class Bots {
+class Bots(
+    private val nameProvider: () -> String
+) {
 
     private val bots = listOf(
-        Bot("Alpha", ::Alpha)
+        Bot("Alpha") { Alpha(nameProvider()) }
     )
 
     fun getBotNames(): List<String> = bots.map(Bot::name)
@@ -18,7 +20,7 @@ class Bots {
 
     companion object {
 
-        fun allBots(): Bots = Bots()
+        fun allBots(nameProvider: () -> String): Bots = Bots(nameProvider)
 
     }
 }

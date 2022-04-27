@@ -30,7 +30,8 @@ data class Configuration internal constructor(
         fun app(
             coroutine: CoroutineScope,
             eventStore: EventStore = InMemoryEventStore.create(),
-            lobbyNameGenerator: () -> String = { faker.food().dish() }
+            lobbyNameGenerator: () -> String = { faker.food().dish() },
+            botNameGenerator: () -> String = { faker.ancient().hero() }
         ): Configuration {
             val eventBus = EventBus(eventStore)
 
@@ -42,7 +43,7 @@ data class Configuration internal constructor(
                 entrance = entrance,
                 tournaments = TournamentFacade(eventBus),
                 gameHistories = GameHistoriesFacade(eventStore),
-                bots = Bots.allBots(),
+                bots = Bots.allBots(botNameGenerator),
                 corsConfiguration = CorsConfiguration(),
                 coroutineScope = coroutine,
                 refreshLobbies = refreshLobbies,

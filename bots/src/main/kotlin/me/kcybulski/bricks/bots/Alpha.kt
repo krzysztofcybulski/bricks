@@ -9,11 +9,11 @@ import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.api.MoveTrigger
 import me.kcybulski.bricks.api.MoveTrigger.OpponentMoved
 
-class Alpha : Algorithm {
+class Alpha(name: String) : Algorithm {
 
     private var emptyPlaces: MutableList<Brick> = mutableListOf()
 
-    override val identity: Identity = Identity(BotNames.name())
+    override val identity: Identity = Identity(name)
 
     override suspend fun initialize(gameInitialized: GameInitialized) {
         (0 until gameInitialized.size - 1)
