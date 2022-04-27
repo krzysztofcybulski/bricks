@@ -20,3 +20,7 @@ data class StartRequest(
 data class AddBotRequest(
     @JsonProperty("name") val name: String
 )
+
+data class AddLobbyRequest(
+    @JsonProperty("name") val name: String? = null
+)

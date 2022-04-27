@@ -1,16 +1,21 @@
 package me.kcybulski.bricks.server
 
-import me.kcybulski.bricks.server.utils.BaseSpec
-import me.kcybulski.bricks.server.utils.ResponseAssertions.jsonShouldBe
-import me.kcybulski.bricks.server.utils.should
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import me.kcybulski.bricks.server.utils.ResponseAssertions.asList
+import me.kcybulski.bricks.server.utils.setupServer
 
-class BotsSpec : BaseSpec({
+class BotsSpec : ShouldSpec({
 
-    should("list all available bots") { app, _ ->
+    should("list all available bots") {
+        //given
+        val server = setupServer {  }
+
         //expect
-        app.httpClient.get("bots") jsonShouldBe listOf(
+        val response = server.get("bots")
+        response.asList() shouldBe listOf(
             mapOf(
-                "name" to "Alpha"
+                "name" to "Alpha",
             )
         )
     }

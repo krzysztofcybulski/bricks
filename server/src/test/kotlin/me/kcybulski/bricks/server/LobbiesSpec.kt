@@ -1,18 +1,25 @@
 package me.kcybulski.bricks.server
 
-import me.kcybulski.bricks.server.utils.BaseSpec
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import me.kcybulski.bricks.server.utils.ResponseAssertions.asList
 import me.kcybulski.bricks.server.utils.ResponseAssertions.emptyList
 import me.kcybulski.bricks.server.utils.ResponseAssertions.emptyObject
-import me.kcybulski.bricks.server.utils.ResponseAssertions.jsonShouldBe
-import me.kcybulski.bricks.server.utils.should
+import me.kcybulski.bricks.server.utils.setupServer
+import ratpack.http.client.ReceivedResponse
 
-class LobbiesSpec : BaseSpec({
+class LobbiesSpec : ShouldSpec({
 
-    should("add new lobby") { app, _ ->
-        app.httpClient.post("lobbies")
+    should("add lobby with random name") {
+        //given
+        val server = setupServer {}
+
+        //when
+        server.post("lobbies")
 
         //then
-        app.httpClient.get("lobbies") jsonShouldBe listOf(
+        val response = server.get("lobbies")
+        response.asList() shouldBe listOf(
             mapOf(
                 "name" to "lobby-0",
                 "status" to "OPEN",
@@ -23,4 +30,18 @@ class LobbiesSpec : BaseSpec({
         )
     }
 
+    should("add lobby with given name") {
+        //given
+        val server = setupServer {
+        }
+
+        //when
+        server.post("lobbies", mapOf("name" to "Hello"))
+
+        //then
+        val response = server.get("lobbies")
+        response.first()["name"] shouldBe "Hello"
+    }
 })
+
+private fun ReceivedResponse.first() = asList().first()

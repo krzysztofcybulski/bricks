@@ -75,14 +75,20 @@ class Server(
 
     private fun lobbiesApi(lobbiesChain: Chain) =
         lobbiesChain
-            .path { ctx ->
-                ctx.byMethod { m ->
-                    m.get { c ->
-                        entrance.lobbies()
-                            .map { it.toResponse(gameHistories) }
-                            .renderJson(c)
-                    }
-                        .post { c -> entrance.newLobby().renderJson(c) }
+            .path { path ->
+                path.byMethod { method ->
+                    method
+                        .get { ctx ->
+                            entrance.lobbies()
+                                .map { it.toResponse(gameHistories) }
+                                .renderJson(ctx)
+                        }
+                        .post { ctx ->
+                            ctx.parse(fromJson(AddLobbyRequest::class.java))
+                                .map { entrance.newLobby(it.name) }
+                                .map { it.toResponse(gameHistories) }
+                                .then { it.renderJson(ctx) }
+                        }
                 }
             }
             .get("updates") { ctx ->

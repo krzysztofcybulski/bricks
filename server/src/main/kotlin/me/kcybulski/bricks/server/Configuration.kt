@@ -2,6 +2,7 @@ package me.kcybulski.bricks.server
 
 import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.newSingleThreadContext
 import me.kcybulski.bricks.bots.Bots
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
@@ -37,7 +38,7 @@ data class Configuration internal constructor(
 
             val lobbyFactory = LobbyFactory(eventBus, lobbyNameGenerator)
             val entrance = Entrance(lobbyFactory, eventBus)
-            val refreshLobbies = RefreshLobbies(eventStore, coroutine)
+            val refreshLobbies = RefreshLobbies(eventStore, CoroutineScope(newSingleThreadContext("refresh")))
 
             val server = Server(
                 entrance = entrance,

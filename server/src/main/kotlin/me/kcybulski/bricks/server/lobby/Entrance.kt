@@ -15,8 +15,8 @@ class Entrance(
 
     operator fun get(name: String) = lobbies[name]
 
-    fun newLobby(): Lobby =
-        lobbyFactory.create()
+    fun newLobby(name: String? = null): Lobby =
+        lobbyFactory.create(name)
             .also { lobbies[it.name] = it }
             .also { eventBus.send(LobbyAdded(it.name, it.id)) }
 

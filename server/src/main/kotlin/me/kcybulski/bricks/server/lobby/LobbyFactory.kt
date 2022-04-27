@@ -8,7 +8,8 @@ class LobbyFactory(
     private val nameGenerator: () -> String
 ) {
 
-    fun create(): Lobby = OpenLobby(coolName(), randomUUID(), eventBus)
+    fun create(name: String? = null): Lobby =
+        OpenLobby(name ?: coolName(), randomUUID(), eventBus)
 
     private fun coolName() = nameGenerator()
         .lowercase()
