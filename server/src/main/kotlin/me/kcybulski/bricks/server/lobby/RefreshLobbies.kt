@@ -8,6 +8,9 @@ import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.launch
 import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.game.GameEndedEvent
+import me.kcybulski.bricks.lobbies.LobbyAdded
+import me.kcybulski.bricks.lobbies.PlayerJoinedToLobby
+import me.kcybulski.bricks.lobbies.PlayerLeftLobby
 import me.kcybulski.bricks.tournament.TournamentEnded
 import me.kcybulski.bricks.tournament.TournamentStarted
 import me.kcybulski.nexum.eventstore.EventStore

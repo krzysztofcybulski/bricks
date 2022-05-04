@@ -29,10 +29,22 @@ class PlayerConnection(
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {
 
-    val healthChannel = Channel<Boolean>(UNLIMITED)
-    val channel = Channel<UserMessage>(UNLIMITED)
+    private val healthChannel = Channel<Boolean>(UNLIMITED)
+    private val channel = Channel<UserMessage>(UNLIMITED)
 
     override val identity: Identity = Identity(name)
+
+    suspend fun ready() {
+        channel.send(ReadyMessage)
+    }
+
+    suspend fun moved(message: MoveMessage) {
+        channel.send(message)
+    }
+
+    suspend fun healthy() {
+        healthChannel.send(true)
+    }
 
     override suspend fun initialize(gameInitialized: GameInitialized) {
         send(

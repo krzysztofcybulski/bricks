@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation(project(":events"))
+    implementation(project(":lobbies"))
     implementation(project(":tournament"))
     implementation(project(":test"))
     implementation(project(":shared-web"))

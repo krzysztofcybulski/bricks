@@ -1,6 +1,8 @@
 package me.kcybulski.bricks.events
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.events.NoStream
 import me.kcybulski.nexum.eventstore.events.Stream
@@ -10,7 +12,8 @@ import mu.KotlinLogging
 import kotlin.reflect.KClass
 
 class EventBus(
-    private val eventStore: EventStore = InMemoryEventStore.create()
+    private val eventStore: EventStore = InMemoryEventStore.create(),
+    private val coroutine: CoroutineScope
 ) {
 
     private val logger = KotlinLogging.logger {}
@@ -23,7 +26,9 @@ class EventBus(
     }
 
     fun <T : Any> send(event: T, streamId: String? = null) {
-        eventStore.publish(event, streamId.stream())
+        coroutine.launch {
+            eventStore.publishAsync(event, streamId.stream())
+        }
     }
 
     fun <T : Any> subscribe(event: KClass<T>, handler: suspend (T) -> Unit) {

@@ -11,6 +11,7 @@ import me.kcybulski.bricks.gamehistory.MapBlock.Taken
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.events.StreamId
 import java.util.UUID
+import java.util.stream.Collectors
 
 class GameHistory internal constructor(
     private val gameId: UUID,
@@ -32,7 +33,7 @@ class GameHistory internal constructor(
     fun getAllEvents(): List<GameEvent> = eventStore.read {
         stream(StreamId(gameId.toString()))
     }
-        .toList()
+        .collect(Collectors.toList())
         .map { it.payload as GameEvent }
 
 }

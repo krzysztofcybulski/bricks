@@ -3,14 +3,15 @@ package me.kcybulski.bricks.server.api
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameState.ENDED
 import me.kcybulski.bricks.gamehistory.GameView
-import me.kcybulski.bricks.server.lobby.ClosedLobby
-import me.kcybulski.bricks.server.lobby.InGameLobby
-import me.kcybulski.bricks.server.lobby.Lobby
-import me.kcybulski.bricks.server.lobby.OpenLobby
+import me.kcybulski.bricks.lobbies.SimpleLobby
+import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.CLOSED
+import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.IN_GAME
+import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.OPEN
 
 data class LobbyWithStateResponse(
     val name: String,
-    val playerNames: List<String>,
+    val image: String,
+    val players: List<PlayerResponse>,
     val status: String,
     val games: List<EndedGameResponse>,
 ) {
@@ -21,16 +22,17 @@ data class LobbyWithStateResponse(
 
 }
 
-fun Lobby.toResponse(gameHistoriesFacade: GameHistoriesFacade) = when (this) {
-    is OpenLobby -> toResponse("OPEN")
-    is InGameLobby -> toResponse("IN_GAME", gameHistoriesFacade.games(id))
-    is ClosedLobby -> toResponse("ENDED", gameHistoriesFacade.games(id))
+fun SimpleLobby.toResponse(gameHistoriesFacade: GameHistoriesFacade) = when (status) {
+    OPEN -> toResponse("OPEN")
+    IN_GAME -> toResponse("IN_GAME", gameHistoriesFacade.games(id))
+    CLOSED -> toResponse("ENDED", gameHistoriesFacade.games(id))
 }
 
-private fun Lobby.toResponse(status: String, games: List<GameView> = emptyList()) =
+private fun SimpleLobby.toResponse(status: String, games: List<GameView> = emptyList()) =
     LobbyWithStateResponse(
         name = name,
-        playerNames = playerNames(),
+        image = image,
+        players = players.map { PlayerResponse(it.name, it.avatarUrl) },
         status = status,
         games = games.map(GameView::toResponse)
     )
@@ -45,6 +47,11 @@ data class EndedGameResponse(
 
 data class BotResponse(
     val name: String
+)
+
+data class PlayerResponse(
+    val name: String,
+    val image: String
 )
 
 private fun GameView.toResponse() = EndedGameResponse(

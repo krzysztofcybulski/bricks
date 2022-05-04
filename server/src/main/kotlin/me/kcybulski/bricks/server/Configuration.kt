@@ -2,25 +2,25 @@ package me.kcybulski.bricks.server
 
 import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import me.kcybulski.bricks.auth.ApiKeys
 import me.kcybulski.bricks.bots.Bots
+import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
+import me.kcybulski.bricks.lobbies.LobbiesModule
+import me.kcybulski.bricks.lobbies.SimpleLobbiesView
 import me.kcybulski.bricks.server.api.BotsApi
 import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
+import me.kcybulski.bricks.server.api.WebsocketsRegistry
 import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
 import me.kcybulski.bricks.server.api.auth.AuthInterceptor
 import me.kcybulski.bricks.server.api.games.GamesApi
 import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
 import me.kcybulski.bricks.server.api.lobbies.LobbyApi
-import me.kcybulski.bricks.server.lobby.Entrance
-import me.kcybulski.bricks.server.lobby.Healthchecker
-import me.kcybulski.bricks.server.lobby.LobbyFactory
 import me.kcybulski.bricks.server.lobby.RefreshLobbies
-import me.kcybulski.bricks.tournament.TournamentFacade
+import me.kcybulski.bricks.tournament.TournamentsModule
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 import java.lang.System.getenv
@@ -28,7 +28,7 @@ import java.lang.System.getenv
 data class Configuration internal constructor(
     val eventStore: EventStore,
     val eventBus: EventBus,
-    val entrance: Entrance,
+    val commandBus: CommandBus,
     val refreshLobbies: RefreshLobbies,
     val server: Server
 ) {
@@ -44,10 +44,15 @@ data class Configuration internal constructor(
             botNameGenerator: () -> String = { faker.ancient().hero() },
             serverPort: Int? = getenv("PORT")?.toInt()
         ): Configuration {
-            val eventBus = EventBus(eventStore)
 
-            val lobbyFactory = LobbyFactory(eventBus, lobbyNameGenerator)
-            val entrance = Entrance(lobbyFactory, eventBus)
+            val eventBus = EventBus(eventStore, CoroutineScope(newSingleThreadContext("eventBus")))
+            val commandBus = CommandBus(CoroutineScope(newSingleThreadContext("commandBus")))
+
+            LobbiesModule.configureInMemory(commandBus, eventBus, lobbyNameGenerator)
+            val lobbiesView = SimpleLobbiesView.inMemory(eventBus)
+
+            TournamentsModule.configure(eventBus, commandBus)
+
             val refreshLobbies = RefreshLobbies(eventStore, CoroutineScope(newSingleThreadContext("refresh")))
 
             val gameHistories = GameHistoriesFacade(eventStore)
@@ -58,14 +63,16 @@ data class Configuration internal constructor(
             val server = Server(
                 lobbiesApi = LobbiesListApi(
                     gameHistories = gameHistories,
-                    entrance = entrance,
                     refreshLobbies = refreshLobbies,
+                    lobbiesView = lobbiesView,
+                    commandBus = commandBus,
                     singleLobbyApi = LobbyApi(
                         gameHistories = gameHistories,
-                        entrance = entrance,
-                        tournaments = TournamentFacade(eventBus),
+                        lobbiesView = lobbiesView,
                         bots = bots,
                         apiKeys = apiKeys,
+                        websocketsRegistry = WebsocketsRegistry(),
+                        commandBus = commandBus,
                         coroutine = coroutine
                     )
                 ),
@@ -80,7 +87,7 @@ data class Configuration internal constructor(
             return Configuration(
                 eventStore = eventStore,
                 eventBus = eventBus,
-                entrance = entrance,
+                commandBus = commandBus,
                 refreshLobbies = refreshLobbies,
                 server = server
             )
