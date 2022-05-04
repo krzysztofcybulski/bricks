@@ -12,6 +12,7 @@ import me.kcybulski.bricks.api.DuoBrick
 import me.kcybulski.bricks.api.GameInitialized
 import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.api.MoveTrigger
+import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.web.FirstMoveMessage
 import me.kcybulski.bricks.web.GameStartedMessage
 import me.kcybulski.bricks.web.HowAreYou
@@ -25,6 +26,7 @@ import java.lang.System.currentTimeMillis
 
 class PlayerConnection(
     name: String,
+    val lobbyId: LobbyId,
     val webSocket: WebSocket,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {

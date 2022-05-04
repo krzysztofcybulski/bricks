@@ -8,6 +8,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.auth.ApiUser
+import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
@@ -20,6 +21,7 @@ import ratpack.websocket.WebSocketHandler
 import ratpack.websocket.WebSocketMessage
 
 class WSHandler(
+    private val lobbyId: LobbyId,
     private val registry: WebsocketsRegistry,
     private val apiUser: ApiUser,
     private val coroutine: CoroutineScope,
@@ -29,7 +31,7 @@ class WSHandler(
     private val logger = KotlinLogging.logger {}
 
     override fun onOpen(webSocket: WebSocket): String? {
-        registry.register(PlayerConnection(apiUser.name, webSocket))
+        registry.register(PlayerConnection(apiUser.name, lobbyId, webSocket))
         return null
     }
 

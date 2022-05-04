@@ -45,7 +45,7 @@ class LobbyApi(
                 lobbiesView.lobby(ctx) { lobby ->
                     apiAuthenticated(apiKeys, ctx) { apiUser ->
                         when (lobby.status) {
-                            OPEN -> WebSockets.websocket(ctx, WSHandler(websocketsRegistry, apiUser, coroutine))
+                            OPEN -> WebSockets.websocket(ctx, WSHandler(LobbyId(lobby.id), websocketsRegistry, apiUser, coroutine))
                             else -> ctx.response.status(400)
                         }
                     }

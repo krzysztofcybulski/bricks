@@ -2,6 +2,7 @@ package me.kcybulski.bricks.events
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.events.NoStream
@@ -9,11 +10,13 @@ import me.kcybulski.nexum.eventstore.events.Stream
 import me.kcybulski.nexum.eventstore.events.StreamId
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 import mu.KotlinLogging
+import java.util.concurrent.Executors
+import java.util.concurrent.Executors.newSingleThreadExecutor
 import kotlin.reflect.KClass
 
 class EventBus(
     private val eventStore: EventStore = InMemoryEventStore.create(),
-    private val coroutine: CoroutineScope
+    private val coroutine: CoroutineScope = CoroutineScope(newSingleThreadExecutor().asCoroutineDispatcher())
 ) {
 
     private val logger = KotlinLogging.logger {}

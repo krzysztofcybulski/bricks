@@ -1,6 +1,7 @@
 package me.kcybulski.bricks.lobbies
 
 import me.kcybulski.bricks.api.Algorithm
+import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.tournament.TournamentSettings
 
 data class CreateLobbyCommand(
@@ -19,4 +20,9 @@ data class DeleteLobbyCommand(
 data class JoinLobbyCommand(
     val id: LobbyId,
     val algorithm: Algorithm
+)
+
+data class KickPlayerCommand(
+    val id: LobbyId,
+    val player: Identity
 )

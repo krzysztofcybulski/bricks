@@ -2,7 +2,6 @@ package me.kcybulski.bricks.lobbies
 
 import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.events.EventBus
-import java.util.UUID
 
 class LobbiesModule private constructor(
     private val factory: LobbyFactory,
@@ -29,6 +28,14 @@ class LobbiesModule private constructor(
             ?.let { repository.save(it) }
     }
 
+    suspend fun kick(command: KickPlayerCommand) {
+        repository
+            .find(command.id)
+            ?.let { it as? OpenLobby }
+            ?.kick(command.player)
+            ?.let { repository.save(it) }
+    }
+
     suspend fun startTournament(command: StartTournamentCommand) {
         repository
             .find(command.id)
@@ -42,8 +49,8 @@ class LobbiesModule private constructor(
     companion object {
 
         fun configureInMemory(
-            commandBus: CommandBus,
             eventBus: EventBus,
+            commandBus: CommandBus,
             lobbyNameGenerator: () -> String
         ) {
             val module = LobbiesModule(
@@ -56,6 +63,7 @@ class LobbiesModule private constructor(
             commandBus.on(StartTournamentCommand::class, module::startTournament)
             commandBus.on(DeleteLobbyCommand::class, module::delete)
             commandBus.on(JoinLobbyCommand::class, module::join)
+            commandBus.on(KickPlayerCommand::class, module::kick)
         }
 
     }

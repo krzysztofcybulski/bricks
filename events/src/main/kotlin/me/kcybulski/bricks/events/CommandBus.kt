@@ -2,16 +2,18 @@ package me.kcybulski.bricks.events
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.kcybulski.nexum.eventstore.subscribing.AllTypesHandler
 import me.kcybulski.nexum.eventstore.subscribing.EventHandler
 import me.kcybulski.nexum.eventstore.subscribing.EventTypeHandler
 import mu.KotlinLogging
+import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 
 class CommandBus(
-    private val coroutine: CoroutineScope,
+    private val coroutine: CoroutineScope = CoroutineScope(Executors.newSingleThreadExecutor().asCoroutineDispatcher()),
     private val handlers: MutableList<EventHandler<*>> = mutableListOf()
 ) {
 

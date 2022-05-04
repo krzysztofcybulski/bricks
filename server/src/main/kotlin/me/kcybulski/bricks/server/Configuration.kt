@@ -2,11 +2,13 @@ package me.kcybulski.bricks.server
 
 import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.newSingleThreadContext
 import me.kcybulski.bricks.auth.ApiKeys
 import me.kcybulski.bricks.bots.Bots
 import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.events.EventBus
+import me.kcybulski.bricks.events.EventsModule
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.LobbiesModule
 import me.kcybulski.bricks.lobbies.SimpleLobbiesView
@@ -19,17 +21,17 @@ import me.kcybulski.bricks.server.api.auth.AuthInterceptor
 import me.kcybulski.bricks.server.api.games.GamesApi
 import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
 import me.kcybulski.bricks.server.api.lobbies.LobbyApi
+import me.kcybulski.bricks.server.lobby.Healthchecker
 import me.kcybulski.bricks.server.lobby.RefreshLobbies
 import me.kcybulski.bricks.tournament.TournamentsModule
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 import java.lang.System.getenv
+import java.util.concurrent.Executors
+import java.util.concurrent.Executors.newSingleThreadExecutor
 
 data class Configuration internal constructor(
-    val eventStore: EventStore,
-    val eventBus: EventBus,
     val commandBus: CommandBus,
-    val refreshLobbies: RefreshLobbies,
     val server: Server
 ) {
 
@@ -45,34 +47,41 @@ data class Configuration internal constructor(
             serverPort: Int? = getenv("PORT")?.toInt()
         ): Configuration {
 
-            val eventBus = EventBus(eventStore, CoroutineScope(newSingleThreadContext("eventBus")))
-            val commandBus = CommandBus(CoroutineScope(newSingleThreadContext("commandBus")))
+            val websocketsRegistry = WebsocketsRegistry()
 
-            LobbiesModule.configureInMemory(commandBus, eventBus, lobbyNameGenerator)
-            val lobbiesView = SimpleLobbiesView.inMemory(eventBus)
+            val eventsModule = EventsModule(
+                eventBus = EventBus(),
+                commandBus = CommandBus(),
+                initializers = listOf(
+                    { eventBus, commandBus, _ -> TournamentsModule.configure(eventBus, commandBus) },
+                    { eventBus, commandBus, _ -> LobbiesModule.configureInMemory(eventBus, commandBus, botNameGenerator) },
+                    { eventBus, _, _ -> RefreshLobbies.configure(eventBus) },
+                    { _, commandBus, modules -> Healthchecker.configure(websocketsRegistry, modules[RefreshLobbies::class], commandBus) }
+                )
+            )
 
-            TournamentsModule.configure(eventBus, commandBus)
-
-            val refreshLobbies = RefreshLobbies(eventStore, CoroutineScope(newSingleThreadContext("refresh")))
+            val lobbiesView = SimpleLobbiesView.inMemory(eventsModule.eventBus)
 
             val gameHistories = GameHistoriesFacade(eventStore)
             val bots = Bots.allBots(botNameGenerator)
 
             val apiKeys = ApiKeys.inMemoryNoHashing()
 
+            eventsModule[Healthchecker::class].start()
+
             val server = Server(
                 lobbiesApi = LobbiesListApi(
                     gameHistories = gameHistories,
-                    refreshLobbies = refreshLobbies,
+                    refreshLobbies = eventsModule[RefreshLobbies::class],
                     lobbiesView = lobbiesView,
-                    commandBus = commandBus,
+                    commandBus = eventsModule.commandBus,
                     singleLobbyApi = LobbyApi(
                         gameHistories = gameHistories,
                         lobbiesView = lobbiesView,
                         bots = bots,
                         apiKeys = apiKeys,
-                        websocketsRegistry = WebsocketsRegistry(),
-                        commandBus = commandBus,
+                        websocketsRegistry = websocketsRegistry,
+                        commandBus = eventsModule.commandBus,
                         coroutine = coroutine
                     )
                 ),
@@ -85,10 +94,7 @@ data class Configuration internal constructor(
             )
 
             return Configuration(
-                eventStore = eventStore,
-                eventBus = eventBus,
-                commandBus = commandBus,
-                refreshLobbies = refreshLobbies,
+                commandBus = eventsModule.commandBus,
                 server = server
             )
         }

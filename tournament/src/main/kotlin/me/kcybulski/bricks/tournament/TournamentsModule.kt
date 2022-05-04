@@ -36,7 +36,13 @@ class TournamentsModule(
         fun configure(eventBus: EventBus, commandBus: CommandBus) {
             val tournamentsModule = TournamentsModule(eventBus)
 
-            commandBus.on(StartNewTournament::class) { command -> tournamentsModule.play(command.id, command.players, command.settings) }
+            commandBus.on(StartNewTournament::class) { command ->
+                tournamentsModule.play(
+                    command.id,
+                    command.players,
+                    command.settings
+                )
+            }
         }
 
     }

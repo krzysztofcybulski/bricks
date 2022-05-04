@@ -7,6 +7,8 @@ class WebsocketsRegistry(
     private val players: MutableSet<PlayerConnection> = mutableSetOf()
 ) {
 
+    fun findAll() = players.toSet()
+
     fun register(playerConnection: PlayerConnection) {
         players += playerConnection
     }
