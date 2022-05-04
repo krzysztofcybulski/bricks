@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.kcybulski.bricks.auth.ApiUser
 import me.kcybulski.bricks.server.lobby.OpenLobby
 import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
@@ -21,6 +22,7 @@ import ratpack.websocket.WebSocketMessage
 
 class WSHandler(
     private val lobby: OpenLobby,
+    private val apiUser: ApiUser,
     private val coroutine: CoroutineScope,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : WebSocketHandler<String> {
@@ -47,7 +49,7 @@ class WSHandler(
 
     private suspend fun handleMessage(message: UserMessage, connection: WebSocket) = coroutineScope {
         when (message) {
-            is RegisterMessage -> lobby.registerPlayer(message.name, connection)
+            is RegisterMessage -> lobby.registerPlayer(apiUser.name, connection)
             is ReadyMessage -> lobby.ready(connection)
             is MoveMessage -> lobby.moved(connection, message)
             is ImHealthy -> lobby.healthy(connection)

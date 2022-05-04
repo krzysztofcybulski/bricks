@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.parameter
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
@@ -33,6 +34,7 @@ import mu.KotlinLogging
 
 internal class WSBricksClient(
     private val http: HttpClient,
+    private val apiKey: String,
     private val host: String,
     private val port: Int,
     private val jackson: ObjectMapper
@@ -41,7 +43,13 @@ internal class WSBricksClient(
     private val logger = KotlinLogging.logger {}
 
     suspend fun connect(lobby: String, bricks: Algorithm) = withContext(SupervisorJob()) {
-        http.webSocket(method = Get, host = host, port = port, path = "/${lobby}/game") {
+        http.webSocket(
+            method = Get,
+            host = host,
+            port = port,
+            path = "/lobbies/${lobby}/game",
+            { parameter("key", apiKey) }
+        ) {
             sendJson(RegisterMessage(bricks.identity.name))
             logger.info { "Registered as ${bricks.identity.name}" }
             incoming.consumeAsFlow()

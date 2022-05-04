@@ -2,13 +2,22 @@ package me.kcybulski.bricks.server
 
 import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import me.kcybulski.bricks.auth.ApiKeys
 import me.kcybulski.bricks.bots.Bots
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
+import me.kcybulski.bricks.server.api.BotsApi
 import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
+import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
+import me.kcybulski.bricks.server.api.auth.AuthInterceptor
+import me.kcybulski.bricks.server.api.games.GamesApi
+import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
+import me.kcybulski.bricks.server.api.lobbies.LobbyApi
 import me.kcybulski.bricks.server.lobby.Entrance
+import me.kcybulski.bricks.server.lobby.Healthchecker
 import me.kcybulski.bricks.server.lobby.LobbyFactory
 import me.kcybulski.bricks.server.lobby.RefreshLobbies
 import me.kcybulski.bricks.tournament.TournamentFacade
@@ -32,7 +41,8 @@ data class Configuration internal constructor(
             coroutine: CoroutineScope,
             eventStore: EventStore = InMemoryEventStore.create(),
             lobbyNameGenerator: () -> String = { faker.food().dish() },
-            botNameGenerator: () -> String = { faker.ancient().hero() }
+            botNameGenerator: () -> String = { faker.ancient().hero() },
+            serverPort: Int? = getenv("PORT")?.toInt()
         ): Configuration {
             val eventBus = EventBus(eventStore)
 
@@ -40,15 +50,31 @@ data class Configuration internal constructor(
             val entrance = Entrance(lobbyFactory, eventBus)
             val refreshLobbies = RefreshLobbies(eventStore, CoroutineScope(newSingleThreadContext("refresh")))
 
+            val gameHistories = GameHistoriesFacade(eventStore)
+            val bots = Bots.allBots(botNameGenerator)
+
+            val apiKeys = ApiKeys.inMemoryNoHashing()
+
             val server = Server(
-                entrance = entrance,
-                tournaments = TournamentFacade(eventBus),
-                gameHistories = GameHistoriesFacade(eventStore),
-                bots = Bots.allBots(botNameGenerator),
+                lobbiesApi = LobbiesListApi(
+                    gameHistories = gameHistories,
+                    entrance = entrance,
+                    refreshLobbies = refreshLobbies,
+                    singleLobbyApi = LobbyApi(
+                        gameHistories = gameHistories,
+                        entrance = entrance,
+                        tournaments = TournamentFacade(eventBus),
+                        bots = bots,
+                        apiKeys = apiKeys,
+                        coroutine = coroutine
+                    )
+                ),
+                gamesApi = GamesApi(gameHistories),
+                botsApi = BotsApi(bots),
+                apiKeysApi = ApiKeysApi(apiKeys),
                 corsConfiguration = CorsConfiguration(),
-                coroutineScope = coroutine,
-                refreshLobbies = refreshLobbies,
-                port = getenv("PORT")?.toInt() ?: 5050
+                authInterceptor = AuthInterceptor.fromEnvironmentVariables(),
+                port = serverPort
             )
 
             return Configuration(

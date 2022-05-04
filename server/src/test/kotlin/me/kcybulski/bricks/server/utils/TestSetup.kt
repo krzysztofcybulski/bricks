@@ -6,6 +6,7 @@ import me.kcybulski.bricks.server.Configuration
 import me.kcybulski.bricks.server.utils.ResponseAssertions.json
 import ratpack.http.client.ReceivedResponse
 import ratpack.test.embed.EmbeddedApp
+import kotlin.random.Random
 
 suspend fun server(spec: TestServerSpec.() -> Unit = {}) = coroutineScope {
 
@@ -14,7 +15,8 @@ suspend fun server(spec: TestServerSpec.() -> Unit = {}) = coroutineScope {
     val configuration = Configuration.app(
         coroutine = this,
         lobbyNameGenerator = settings.lobbyNameGenerator,
-        botNameGenerator = settings.botNameGenerator
+        botNameGenerator = settings.botNameGenerator,
+        serverPort = Random.nextInt(5000, 6000)
     )
 
     TestServer(configuration)
@@ -32,7 +34,8 @@ class TestServerSpec {
 
 class TestServer(configuration: Configuration) : AutoCloseable {
 
-    private val app = EmbeddedApp.fromServer(configuration.server.ratpackServer)
+    private val app = EmbeddedApp
+        .fromServer(configuration.server.ratpackServer)
 
     fun get(path: String): ReceivedResponse =
         app
@@ -57,7 +60,6 @@ class TestServer(configuration: Configuration) : AutoCloseable {
             }
 
     override fun close() {
-        println("Close")
         app.close()
     }
 

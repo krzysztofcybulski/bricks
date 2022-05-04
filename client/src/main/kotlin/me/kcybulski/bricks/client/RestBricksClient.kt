@@ -6,11 +6,11 @@ import io.ktor.client.request.get
 
 internal class RestBricksClient(
     private val httpClient: HttpClient,
-    private val host: String,
-    private val port: Int
+    host: String,
+    port: Int
 ) {
 
-    private val url = "http://$host:$port"
+    private val url = "http://$host:$port/lobbies"
 
     suspend fun getLobbies(): List<Lobby> = httpClient.get(url).body()
 

@@ -7,8 +7,14 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.jackson.jackson
+import kotlinx.coroutines.runBlocking
+import me.kcybulski.bricks.api.Block
+import me.kcybulski.bricks.api.Brick
+import me.kcybulski.bricks.api.DuoBrick
+import me.kcybulski.bricks.api.GameInitialized
+import me.kcybulski.bricks.api.MoveTrigger
 
-class BricksWebClient(host: String, port: Int = 80) {
+class BricksWebClient(apiKey: String, host: String, port: Int = 80) {
 
     private val jackson = jacksonObjectMapper()
 
@@ -21,7 +27,7 @@ class BricksWebClient(host: String, port: Int = 80) {
         }
     }
 
-    private val websocket = WSBricksClient(httpClient, host, port, jackson)
+    private val websocket = WSBricksClient(httpClient, apiKey, host, port, jackson)
 
     private val rest = RestBricksClient(httpClient, host, port)
 
@@ -44,4 +50,23 @@ class BricksWebClient(host: String, port: Int = 80) {
         }
         register(lobbies[readLine()!!.toInt()].name, algorithm)
     }
+}
+
+fun main() = runBlocking {
+    BricksWebClient("9590ff1106844852a72f25dd8f5bfd57", "localhost", 5050)
+        .register(MyAlgo)
+}
+
+object MyAlgo: UserAlgorithm() {
+    override suspend fun move(opponentMoved: MoveTrigger.OpponentMoved): Brick {
+        return DuoBrick.unsafe(Block(2, 0), Block(2, 1))
+    }
+
+    override suspend fun firstMove(): Brick {
+        return DuoBrick.unsafe(Block(0, 0), Block(1, 0))
+    }
+
+    override suspend fun initialize(gameInitialized: GameInitialized) {
+    }
+
 }

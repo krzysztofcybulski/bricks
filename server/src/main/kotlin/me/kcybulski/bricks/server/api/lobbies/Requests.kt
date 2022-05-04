@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server.api
+package me.kcybulski.bricks.server.api.lobbies
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import me.kcybulski.bricks.game.GameSettings
