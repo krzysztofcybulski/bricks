@@ -7,9 +7,6 @@ import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.JoinLobbyCommand
 import me.kcybulski.bricks.lobbies.LobbyId
-import me.kcybulski.bricks.lobbies.SimpleLobbiesView
-import me.kcybulski.bricks.lobbies.SimpleLobby
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.OPEN
 import me.kcybulski.bricks.lobbies.StartTournamentCommand
 import me.kcybulski.bricks.server.api.WSHandler
 import me.kcybulski.bricks.server.api.WebsocketsRegistry
@@ -17,15 +14,17 @@ import me.kcybulski.bricks.server.api.apikeys.apiAuthenticated
 import me.kcybulski.bricks.server.api.auth.authenticated
 import me.kcybulski.bricks.server.api.renderJson
 import me.kcybulski.bricks.server.api.toResponse
+import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
+import me.kcybulski.bricks.server.views.lobbies.LobbyView
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.OPEN
 import ratpack.handling.Chain
 import ratpack.handling.Context
 import ratpack.jackson.Jackson
 import ratpack.websocket.WebSockets
-import java.util.UUID
 
 class LobbyApi(
     private val gameHistories: GameHistoriesFacade,
-    private val lobbiesView: SimpleLobbiesView,
+    private val lobbiesView: LobbiesListReadModel,
     private val bots: Bots,
     private val apiKeys: ApiKeys,
     private val websocketsRegistry: WebsocketsRegistry,
@@ -82,7 +81,7 @@ class LobbyApi(
     }
 }
 
-private fun SimpleLobbiesView.lobby(ctx: Context, handler: (SimpleLobby) -> Unit) =
+private fun LobbiesListReadModel.lobby(ctx: Context, handler: (LobbyView) -> Unit) =
     findLobby(ctx.allPathTokens["lobby"]!!)
         ?.let { handler(it) }
         ?: ctx.notFound()

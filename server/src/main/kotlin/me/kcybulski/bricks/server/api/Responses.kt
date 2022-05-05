@@ -3,10 +3,10 @@ package me.kcybulski.bricks.server.api
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameState.ENDED
 import me.kcybulski.bricks.gamehistory.GameView
-import me.kcybulski.bricks.lobbies.SimpleLobby
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.CLOSED
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.IN_GAME
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.OPEN
+import me.kcybulski.bricks.server.views.lobbies.LobbyView
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.CLOSED
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.IN_GAME
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.OPEN
 
 data class LobbyWithStateResponse(
     val name: String,
@@ -22,13 +22,13 @@ data class LobbyWithStateResponse(
 
 }
 
-fun SimpleLobby.toResponse(gameHistoriesFacade: GameHistoriesFacade) = when (status) {
+fun LobbyView.toResponse(gameHistoriesFacade: GameHistoriesFacade) = when (status) {
     OPEN -> toResponse("OPEN")
     IN_GAME -> toResponse("IN_GAME", gameHistoriesFacade.games(id))
     CLOSED -> toResponse("ENDED", gameHistoriesFacade.games(id))
 }
 
-private fun SimpleLobby.toResponse(status: String, games: List<GameView> = emptyList()) =
+private fun LobbyView.toResponse(status: String, games: List<GameView> = emptyList()) =
     LobbyWithStateResponse(
         name = name,
         image = image,

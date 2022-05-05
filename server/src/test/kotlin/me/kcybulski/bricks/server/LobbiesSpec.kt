@@ -2,6 +2,7 @@ package me.kcybulski.bricks.server
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import me.kcybulski.bricks.server.utils.ResponseAssertions.asList
 import me.kcybulski.bricks.server.utils.ResponseAssertions.emptyList
 import me.kcybulski.bricks.server.utils.ResponseAssertions.emptyObject
@@ -19,18 +20,17 @@ class LobbiesSpec : ShouldSpec({
 
         //then
         val response = server.get("lobbies")
-        response.asList() shouldBe listOf(
-            mapOf(
-                "name" to "lobby-0",
-                "status" to "OPEN",
-                "playerNames" to emptyList,
-                "games" to emptyList,
-                "points" to emptyObject
-            )
-        )
+        response.asList().first().run {
+            get("name") shouldBe "lobby-0"
+            get("status") shouldBe "OPEN"
+            get("image") as String shouldStartWith "https"
+            get("players") shouldBe emptyList
+            get("games") shouldBe emptyList
+            get("points") shouldBe emptyObject
+        }
     }
 
-    should("add lobby with given name") {
+    should("add lobby with given name normalized") {
         //given
         val server = setupServer {
         }
@@ -40,7 +40,7 @@ class LobbiesSpec : ShouldSpec({
 
         //then
         val response = server.get("lobbies")
-        response.first()["name"] shouldBe "Hello"
+        response.first()["name"] shouldBe "hello"
     }
 })
 

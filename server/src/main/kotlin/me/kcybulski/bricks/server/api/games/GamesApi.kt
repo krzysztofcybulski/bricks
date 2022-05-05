@@ -2,7 +2,6 @@ package me.kcybulski.bricks.server.api.games
 
 import me.kcybulski.bricks.gamehistory.GameEventsRenderer
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
-import me.kcybulski.bricks.gamehistory.GameMapRenderer
 import ratpack.handling.Chain
 import ratpack.handling.Context
 import ratpack.jackson.Jackson
@@ -16,7 +15,7 @@ class GamesApi(
         chain.prefix(":gameId", this::singleGameApi)
     }
 
-    fun singleGameApi(chain: Chain) {
+    private fun singleGameApi(chain: Chain) {
         chain
             .get("events") { ctx ->
                 gameHistories.game(ctx.gameId)
@@ -24,13 +23,6 @@ class GamesApi(
                     .map(GameEventsRenderer::toEventResponse)
                     .let(Jackson::json)
                     .let(ctx::render)
-            }
-            .get(":time?") { ctx ->
-                gameHistories.game(ctx.gameId)
-                    .at(ctx.gameTime)
-                    ?.let(GameMapRenderer::toString)
-                    ?.let(ctx::render)
-                    ?: ctx.notFound()
             }
     }
 

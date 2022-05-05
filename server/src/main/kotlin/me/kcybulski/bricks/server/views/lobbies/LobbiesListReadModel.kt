@@ -1,26 +1,34 @@
-package me.kcybulski.bricks.lobbies
+package me.kcybulski.bricks.server.views.lobbies
 
 import me.kcybulski.bricks.events.EventBus
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.CLOSED
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.IN_GAME
-import me.kcybulski.bricks.lobbies.SimpleLobbyStatus.OPEN
+import me.kcybulski.bricks.lobbies.LobbyAdded
+import me.kcybulski.bricks.lobbies.LobbyClosed
+import me.kcybulski.bricks.lobbies.LobbyDeleted
+import me.kcybulski.bricks.lobbies.LobbyId
+import me.kcybulski.bricks.lobbies.LobbyStartedTournament
+import me.kcybulski.bricks.lobbies.PlayerJoinedToLobby
+import me.kcybulski.bricks.lobbies.PlayerLeftLobby
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Player
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.CLOSED
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.IN_GAME
+import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.OPEN
 import java.util.UUID
 
-class SimpleLobbiesView private constructor() {
+class LobbiesListReadModel private constructor() {
 
-    private val memory: MutableMap<String, SimpleLobby> = mutableMapOf()
+    private val memory: MutableMap<String, LobbyView> = mutableMapOf()
 
-    fun findAllLobbies(): List<SimpleLobby> =
+    fun findAllLobbies(): List<LobbyView> =
         memory.values.toList()
 
-    fun findLobby(id: LobbyId): SimpleLobby? =
+    fun findLobby(id: LobbyId): LobbyView? =
         memory[id.raw.toString()]
 
-    fun findLobby(name: String): SimpleLobby? =
+    fun findLobby(name: String): LobbyView? =
         memory.values.find { it.name == name }
 
     private fun onLobbyAdded(event: LobbyAdded) {
-        memory[event.lobbyId.raw.toString()] = SimpleLobby(
+        memory[event.lobbyId.raw.toString()] = LobbyView(
             id = event.lobbyId.raw,
             name = event.lobbyName,
             image = "https://avatars.dicebear.com/api/bottts/${event.lobbyId.raw}.svg?style=circle",
@@ -34,7 +42,10 @@ class SimpleLobbiesView private constructor() {
     }
 
     private fun onPlayerJoinedToLobby(event: PlayerJoinedToLobby) {
-        val player = SimplePlayerInLobby(event.player, "https://avatars.dicebear.com/api/avataaars/${event.player}.svg?style=circle")
+        val player = Player(
+            event.player,
+            "https://avatars.dicebear.com/api/avataaars/${event.player}.svg?style=circle"
+        )
         memory[event.lobbyId.raw.toString()]
             ?.let { it.copy(players = it.players + player) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
@@ -42,7 +53,7 @@ class SimpleLobbiesView private constructor() {
 
     private fun onPlayerLeftLobby(event: PlayerLeftLobby) {
         memory[event.lobbyId.raw.toString()]
-            ?.let { it.copy(players = it.players.filter { p -> p.name != event.player } ) }
+            ?.let { it.copy(players = it.players.filter { p -> p.name != event.player }) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
 
@@ -60,8 +71,8 @@ class SimpleLobbiesView private constructor() {
 
     companion object {
 
-        fun inMemory(eventBus: EventBus): SimpleLobbiesView {
-            val lobbiesViews = SimpleLobbiesView()
+        fun configureInMemory(eventBus: EventBus): LobbiesListReadModel {
+            val lobbiesViews = LobbiesListReadModel()
 
             eventBus.subscribe(LobbyAdded::class, lobbiesViews::onLobbyAdded)
             eventBus.subscribe(LobbyDeleted::class, lobbiesViews::onLobbyDeleted)
@@ -77,22 +88,23 @@ class SimpleLobbiesView private constructor() {
 
 }
 
-data class SimpleLobby(
+data class LobbyView(
     val id: UUID,
     val name: String,
     val image: String,
-    val players: List<SimplePlayerInLobby>,
-    val status: SimpleLobbyStatus
-)
+    val players: List<Player>,
+    val status: Status
+) {
 
-enum class SimpleLobbyStatus {
+    enum class Status {
 
-    OPEN, IN_GAME, CLOSED
+        OPEN, IN_GAME, CLOSED
+
+    }
+
+    data class Player(
+        val name: String,
+        val avatarUrl: String
+    )
 
 }
-
-data class SimplePlayerInLobby(
-    val name: String,
-    val avatarUrl: String
-)
-

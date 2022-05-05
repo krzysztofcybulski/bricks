@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server.lobby
+package me.kcybulski.bricks.server.healthcheck
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay

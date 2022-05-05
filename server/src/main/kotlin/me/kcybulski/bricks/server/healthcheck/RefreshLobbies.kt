@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server.lobby
+package me.kcybulski.bricks.server.healthcheck
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -8,7 +8,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.launch
 import me.kcybulski.bricks.api.Identity
-import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.GameEndedEvent
 import me.kcybulski.bricks.lobbies.LobbyAdded

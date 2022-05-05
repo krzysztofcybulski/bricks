@@ -3,18 +3,18 @@ package me.kcybulski.bricks.server.api.lobbies
 import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.CreateLobbyCommand
-import me.kcybulski.bricks.lobbies.SimpleLobbiesView
 import me.kcybulski.bricks.server.api.auth.authenticated
 import me.kcybulski.bricks.server.api.renderJson
 import me.kcybulski.bricks.server.api.toResponse
-import me.kcybulski.bricks.server.lobby.RefreshLobbies
+import me.kcybulski.bricks.server.healthcheck.RefreshLobbies
+import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
 import ratpack.handling.Chain
 import ratpack.jackson.Jackson.fromJson
 import ratpack.websocket.WebSockets
 
 class LobbiesListApi(
     private val gameHistories: GameHistoriesFacade,
-    private val lobbiesView: SimpleLobbiesView,
+    private val lobbiesView: LobbiesListReadModel,
     private val refreshLobbies: RefreshLobbies,
     private val singleLobbyApi: LobbyApi,
     private val commandBus: CommandBus

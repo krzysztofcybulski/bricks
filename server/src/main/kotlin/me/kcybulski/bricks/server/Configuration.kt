@@ -2,8 +2,6 @@ package me.kcybulski.bricks.server
 
 import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.newSingleThreadContext
 import me.kcybulski.bricks.auth.ApiKeys
 import me.kcybulski.bricks.bots.Bots
 import me.kcybulski.bricks.events.CommandBus
@@ -11,7 +9,6 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.events.EventsModule
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.LobbiesModule
-import me.kcybulski.bricks.lobbies.SimpleLobbiesView
 import me.kcybulski.bricks.server.api.BotsApi
 import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
@@ -21,14 +18,14 @@ import me.kcybulski.bricks.server.api.auth.AuthInterceptor
 import me.kcybulski.bricks.server.api.games.GamesApi
 import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
 import me.kcybulski.bricks.server.api.lobbies.LobbyApi
-import me.kcybulski.bricks.server.lobby.Healthchecker
-import me.kcybulski.bricks.server.lobby.RefreshLobbies
+import me.kcybulski.bricks.server.healthcheck.Healthchecker
+import me.kcybulski.bricks.server.healthcheck.RefreshLobbies
+import me.kcybulski.bricks.server.views.gamehistory.GamesHistoryReadModel
+import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
 import me.kcybulski.bricks.tournament.TournamentsModule
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 import java.lang.System.getenv
-import java.util.concurrent.Executors
-import java.util.concurrent.Executors.newSingleThreadExecutor
 
 data class Configuration internal constructor(
     val commandBus: CommandBus,
@@ -54,18 +51,17 @@ data class Configuration internal constructor(
                 commandBus = CommandBus(),
                 initializers = listOf(
                     { eventBus, commandBus, _ -> TournamentsModule.configure(eventBus, commandBus) },
-                    { eventBus, commandBus, _ -> LobbiesModule.configureInMemory(eventBus, commandBus, botNameGenerator) },
+                    { eventBus, commandBus, _ -> LobbiesModule.configureInMemory(eventBus, commandBus, lobbyNameGenerator) },
                     { eventBus, _, _ -> RefreshLobbies.configure(eventBus) },
-                    { _, commandBus, modules -> Healthchecker.configure(websocketsRegistry, modules[RefreshLobbies::class], commandBus) }
+                    { _, commandBus, modules -> Healthchecker.configure(websocketsRegistry, modules[RefreshLobbies::class], commandBus) },
+                    { eventBus, _, _ -> LobbiesListReadModel.configureInMemory(eventBus) },
+                    { eventBus, _, _ -> GamesHistoryReadModel.configureInMemory(eventBus) },
+                    { _, _, _ -> Bots.allBots(botNameGenerator) },
+                    { _, _, _ -> ApiKeys.inMemoryNoHashing() }
                 )
             )
 
-            val lobbiesView = SimpleLobbiesView.inMemory(eventsModule.eventBus)
-
             val gameHistories = GameHistoriesFacade(eventStore)
-            val bots = Bots.allBots(botNameGenerator)
-
-            val apiKeys = ApiKeys.inMemoryNoHashing()
 
             eventsModule[Healthchecker::class].start()
 
@@ -73,21 +69,21 @@ data class Configuration internal constructor(
                 lobbiesApi = LobbiesListApi(
                     gameHistories = gameHistories,
                     refreshLobbies = eventsModule[RefreshLobbies::class],
-                    lobbiesView = lobbiesView,
+                    lobbiesView = eventsModule[LobbiesListReadModel::class],
                     commandBus = eventsModule.commandBus,
                     singleLobbyApi = LobbyApi(
                         gameHistories = gameHistories,
-                        lobbiesView = lobbiesView,
-                        bots = bots,
-                        apiKeys = apiKeys,
+                        lobbiesView = eventsModule[LobbiesListReadModel::class],
+                        bots = eventsModule[Bots::class],
+                        apiKeys = eventsModule[ApiKeys::class],
                         websocketsRegistry = websocketsRegistry,
                         commandBus = eventsModule.commandBus,
                         coroutine = coroutine
                     )
                 ),
                 gamesApi = GamesApi(gameHistories),
-                botsApi = BotsApi(bots),
-                apiKeysApi = ApiKeysApi(apiKeys),
+                botsApi = BotsApi(eventsModule[Bots::class]),
+                apiKeysApi = ApiKeysApi(eventsModule[ApiKeys::class]),
                 corsConfiguration = CorsConfiguration(),
                 authInterceptor = AuthInterceptor.fromEnvironmentVariables(),
                 port = serverPort
