@@ -59,8 +59,8 @@ class RefreshLobbies private constructor(
             val refreshLobbies = RefreshLobbies()
 
             eventBus.subscribe(GameEndedEvent::class) { refreshLobbies.sendToChannel(GameEndedMessage(it.gameId)) }
-            eventBus.subscribe(PlayerJoinedToLobby::class) { refreshLobbies.sendToChannel(PlayerJoinedMessage(it.player)) }
-            eventBus.subscribe(PlayerLeftLobby::class) { refreshLobbies.sendToChannel(PlayerLeftMessage(it.player)) }
+            eventBus.subscribe(PlayerJoinedToLobby::class) { refreshLobbies.sendToChannel(PlayerJoinedMessage(it.player.name)) }
+            eventBus.subscribe(PlayerLeftLobby::class) { refreshLobbies.sendToChannel(PlayerLeftMessage(it.player.name)) }
             eventBus.subscribe(LobbyAdded::class) { refreshLobbies.sendToChannel(LobbyAddedMessage(it.lobbyName)) }
             eventBus.subscribe(TournamentStarted::class) { refreshLobbies.sendToChannel(TournamentStartedMessage(it.tournamentId)) }
             eventBus.subscribe(TournamentEnded::class) { refreshLobbies.sendToChannel(TournamentEndedMessage(it.tournamentId)) }

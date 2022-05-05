@@ -8,6 +8,7 @@ import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.lobbies.LobbyStartedTournament
 import me.kcybulski.bricks.lobbies.PlayerJoinedToLobby
 import me.kcybulski.bricks.lobbies.PlayerLeftLobby
+import me.kcybulski.bricks.server.views.Avatars
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Player
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.CLOSED
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.IN_GAME
@@ -31,7 +32,7 @@ class LobbiesListReadModel private constructor() {
         memory[event.lobbyId.raw.toString()] = LobbyView(
             id = event.lobbyId.raw,
             name = event.lobbyName,
-            image = "https://avatars.dicebear.com/api/bottts/${event.lobbyId.raw}.svg?style=circle",
+            image = Avatars.generateForLobby(event.lobbyId),
             players = emptyList(),
             status = OPEN
         )
@@ -42,10 +43,7 @@ class LobbiesListReadModel private constructor() {
     }
 
     private fun onPlayerJoinedToLobby(event: PlayerJoinedToLobby) {
-        val player = Player(
-            event.player,
-            "https://avatars.dicebear.com/api/avataaars/${event.player}.svg?style=circle"
-        )
+        val player = Player(event.player.name, Avatars.generateForPlayer(event.player))
         memory[event.lobbyId.raw.toString()]
             ?.let { it.copy(players = it.players + player) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
@@ -53,7 +51,7 @@ class LobbiesListReadModel private constructor() {
 
     private fun onPlayerLeftLobby(event: PlayerLeftLobby) {
         memory[event.lobbyId.raw.toString()]
-            ?.let { it.copy(players = it.players.filter { p -> p.name != event.player }) }
+            ?.let { it.copy(players = it.players.filter { p -> p.name != event.player.name }) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
 

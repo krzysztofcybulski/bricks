@@ -1,7 +1,6 @@
 package me.kcybulski.bricks.server.api.bots
 
 import me.kcybulski.bricks.bots.Bots
-import me.kcybulski.bricks.server.api.BotResponse
 import ratpack.handling.Chain
 import ratpack.jackson.Jackson
 

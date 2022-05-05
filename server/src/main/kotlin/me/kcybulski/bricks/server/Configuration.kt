@@ -9,19 +9,23 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.events.EventsModule
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.LobbiesModule
-import me.kcybulski.bricks.server.api.bots.BotsApi
 import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
-import me.kcybulski.bricks.server.api.lobbies.WebsocketsRegistry
 import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
 import me.kcybulski.bricks.server.api.auth.AuthInterceptor
+import me.kcybulski.bricks.server.api.bots.BotsApi
 import me.kcybulski.bricks.server.api.games.GamesApi
+import me.kcybulski.bricks.server.api.games.GamesApiV2
 import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
-import me.kcybulski.bricks.server.api.lobbies.LobbyApi
+import me.kcybulski.bricks.server.api.lobbies.LobbiesListApiV2
+import me.kcybulski.bricks.server.api.lobbies.SingleLobbyApi
+import me.kcybulski.bricks.server.api.lobbies.SingleLobbyApiV2
+import me.kcybulski.bricks.server.api.lobbies.WebsocketsRegistry
 import me.kcybulski.bricks.server.healthcheck.Healthchecker
 import me.kcybulski.bricks.server.healthcheck.RefreshLobbies
 import me.kcybulski.bricks.server.views.gamehistory.GamesHistoryReadModel
 import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
+import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsReadModel
 import me.kcybulski.bricks.tournament.TournamentsModule
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
@@ -55,6 +59,7 @@ data class Configuration internal constructor(
                     { eventBus, _, _ -> RefreshLobbies.configure(eventBus) },
                     { _, commandBus, modules -> Healthchecker.configure(websocketsRegistry, modules[RefreshLobbies::class], commandBus) },
                     { eventBus, _, _ -> LobbiesListReadModel.configureInMemory(eventBus) },
+                    { eventBus, _, _ -> LobbyDetailsReadModel.configureInMemory(eventBus) },
                     { eventBus, _, _ -> GamesHistoryReadModel.configureInMemory(eventBus) },
                     { _, _, _ -> Bots.allBots(botNameGenerator) },
                     { _, _, _ -> ApiKeys.inMemoryNoHashing() }
@@ -71,7 +76,7 @@ data class Configuration internal constructor(
                     refreshLobbies = eventsModule[RefreshLobbies::class],
                     lobbiesView = eventsModule[LobbiesListReadModel::class],
                     commandBus = eventsModule.commandBus,
-                    singleLobbyApi = LobbyApi(
+                    singleLobbyApi = SingleLobbyApi(
                         gameHistories = gameHistories,
                         lobbiesView = eventsModule[LobbiesListReadModel::class],
                         bots = eventsModule[Bots::class],
@@ -81,7 +86,21 @@ data class Configuration internal constructor(
                         coroutine = coroutine
                     )
                 ),
+                lobbiesApiv2 = LobbiesListApiV2(
+                    refreshLobbies = eventsModule[RefreshLobbies::class],
+                    lobbiesView = eventsModule[LobbiesListReadModel::class],
+                    commandBus = eventsModule.commandBus,
+                    singleLobbyApi = SingleLobbyApiV2(
+                        lobbyReadModel = eventsModule[LobbyDetailsReadModel::class],
+                        bots = eventsModule[Bots::class],
+                        apiKeys = eventsModule[ApiKeys::class],
+                        websocketsRegistry = websocketsRegistry,
+                        commandBus = eventsModule.commandBus,
+                        coroutine = coroutine
+                    )
+                ),
                 gamesApi = GamesApi(gameHistories),
+                gamesApiv2 = GamesApiV2(eventsModule[GamesHistoryReadModel::class]),
                 botsApi = BotsApi(eventsModule[Bots::class]),
                 apiKeysApi = ApiKeysApi(eventsModule[ApiKeys::class]),
                 corsConfiguration = CorsConfiguration(),

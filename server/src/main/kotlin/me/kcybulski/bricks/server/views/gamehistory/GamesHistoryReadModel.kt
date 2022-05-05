@@ -21,7 +21,7 @@ class GamesHistoryReadModel private constructor(
         repository.update(
             GameHistoryView(
                 id = event.gameId,
-                startedAt = clock.instant(),
+                startedAt = clock.instant().toString(),
                 players = toPlayerView(event.players.first) to toPlayerView(event.players.second),
                 mapSize = event.size,
                 initialBlocks = event.initialBlocks,
@@ -33,7 +33,7 @@ class GamesHistoryReadModel private constructor(
 
     private fun onPlayerMoved(event: PlayerMovedEvent) {
         repository.find(event.gameId)
-            ?.let { it.copy(moves = it.moves + MoveInGameView(event.player.name, event.brick, clock.instant())) }
+            ?.let { it.copy(moves = it.moves + MoveInGameView(event.player.name, event.brick, clock.instant().toString())) }
             ?.let { repository.update(it) }
     }
 

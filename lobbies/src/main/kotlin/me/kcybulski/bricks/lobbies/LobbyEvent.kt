@@ -1,5 +1,6 @@
 package me.kcybulski.bricks.lobbies
 
+import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.tournament.TournamentSettings
 
 interface LobbyEvent {
@@ -8,12 +9,12 @@ interface LobbyEvent {
 
 data class PlayerJoinedToLobby(
     override val lobbyId: LobbyId,
-    val player: String
+    val player: Identity
 ) : LobbyEvent
 
 data class PlayerLeftLobby(
     override val lobbyId: LobbyId,
-    val player: String
+    val player: Identity
 ) : LobbyEvent
 
 data class LobbyAdded(

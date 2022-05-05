@@ -24,13 +24,13 @@ internal class OpenLobby(
 ): Lobby(id) {
 
     fun join(algorithm: Algorithm): OpenLobby {
-        eventBus.send(PlayerJoinedToLobby(id, algorithm.identity.name), id.toString())
+        eventBus.send(PlayerJoinedToLobby(id, algorithm.identity), id.toString())
         return OpenLobby(id, name, players + algorithm, eventBus, commandBus)
     }
 
     fun kick(identity: Identity): OpenLobby =
         if(identity in players.map(Algorithm::identity)) {
-            eventBus.send(PlayerLeftLobby(id, identity.name), id.toString())
+            eventBus.send(PlayerLeftLobby(id, identity), id.toString())
             OpenLobby(id, name, players.filterNot { it.identity == identity }, eventBus, commandBus)
         } else {
             this

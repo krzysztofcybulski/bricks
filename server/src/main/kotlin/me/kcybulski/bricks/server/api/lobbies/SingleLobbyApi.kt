@@ -11,7 +11,6 @@ import me.kcybulski.bricks.lobbies.StartTournamentCommand
 import me.kcybulski.bricks.server.api.apikeys.apiAuthenticated
 import me.kcybulski.bricks.server.api.auth.authenticated
 import me.kcybulski.bricks.server.api.renderJson
-import me.kcybulski.bricks.server.api.toResponse
 import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
 import me.kcybulski.bricks.server.views.lobbies.LobbyView
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.OPEN
@@ -20,7 +19,7 @@ import ratpack.handling.Context
 import ratpack.jackson.Jackson
 import ratpack.websocket.WebSockets
 
-class LobbyApi(
+class SingleLobbyApi(
     private val gameHistories: GameHistoriesFacade,
     private val lobbiesView: LobbiesListReadModel,
     private val bots: Bots,

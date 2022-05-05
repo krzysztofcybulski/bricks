@@ -29,5 +29,3 @@ class GamesApi(
 }
 
 private val Context.gameId get() = UUID.fromString(allPathTokens["gameId"]!!)
-
-private val Context.gameTime get() = pathTokens["time"]?.toInt() ?: 10000
