@@ -9,10 +9,10 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.events.EventsModule
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.LobbiesModule
-import me.kcybulski.bricks.server.api.BotsApi
+import me.kcybulski.bricks.server.api.bots.BotsApi
 import me.kcybulski.bricks.server.api.CorsConfiguration
 import me.kcybulski.bricks.server.api.Server
-import me.kcybulski.bricks.server.api.WebsocketsRegistry
+import me.kcybulski.bricks.server.api.lobbies.WebsocketsRegistry
 import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
 import me.kcybulski.bricks.server.api.auth.AuthInterceptor
 import me.kcybulski.bricks.server.api.games.GamesApi

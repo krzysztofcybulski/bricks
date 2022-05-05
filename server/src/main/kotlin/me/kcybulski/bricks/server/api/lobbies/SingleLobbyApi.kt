@@ -8,8 +8,6 @@ import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.JoinLobbyCommand
 import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.lobbies.StartTournamentCommand
-import me.kcybulski.bricks.server.api.WSHandler
-import me.kcybulski.bricks.server.api.WebsocketsRegistry
 import me.kcybulski.bricks.server.api.apikeys.apiAuthenticated
 import me.kcybulski.bricks.server.api.auth.authenticated
 import me.kcybulski.bricks.server.api.renderJson

@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server.api
+package me.kcybulski.bricks.server.api.lobbies
 
 import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.gamehistory.GameState.ENDED
@@ -43,10 +43,6 @@ data class EndedGameResponse(
     val players: List<String>,
     val size: Int,
     val state: String
-)
-
-data class BotResponse(
-    val name: String
 )
 
 data class PlayerResponse(

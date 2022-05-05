@@ -3,6 +3,7 @@ package me.kcybulski.bricks.server.api
 import me.kcybulski.bricks.server.ErrorHandler
 import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
 import me.kcybulski.bricks.server.api.auth.AuthInterceptor
+import me.kcybulski.bricks.server.api.bots.BotsApi
 import me.kcybulski.bricks.server.api.games.GamesApi
 import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
 import ratpack.error.ClientErrorHandler

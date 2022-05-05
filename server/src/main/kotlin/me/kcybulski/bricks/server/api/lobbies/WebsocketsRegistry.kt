@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server.api
+package me.kcybulski.bricks.server.api.lobbies
 
 import me.kcybulski.bricks.server.PlayerConnection
 import ratpack.websocket.WebSocket

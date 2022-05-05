@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server.api
+package me.kcybulski.bricks.server.api.lobbies
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

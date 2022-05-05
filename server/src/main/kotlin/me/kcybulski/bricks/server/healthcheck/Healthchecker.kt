@@ -8,7 +8,7 @@ import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.lobbies.KickPlayerCommand
 import me.kcybulski.bricks.server.Healthy
 import me.kcybulski.bricks.server.NotHealthy
-import me.kcybulski.bricks.server.api.WebsocketsRegistry
+import me.kcybulski.bricks.server.api.lobbies.WebsocketsRegistry
 
 class Healthchecker private constructor(
     private val websocketsRegistry: WebsocketsRegistry,
