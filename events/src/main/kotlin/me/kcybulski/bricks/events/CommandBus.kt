@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import me.kcybulski.nexum.eventstore.subscribing.AllTypesHandler
 import me.kcybulski.nexum.eventstore.subscribing.EventHandler
 import me.kcybulski.nexum.eventstore.subscribing.EventTypeHandler

@@ -1,7 +1,6 @@
 package me.kcybulski.bricks.server.api
 
 import ratpack.handling.Context
-import java.lang.System.getProperty
 import java.lang.System.getenv
 
 class CorsConfiguration {

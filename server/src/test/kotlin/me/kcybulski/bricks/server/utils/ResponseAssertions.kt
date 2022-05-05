@@ -16,6 +16,6 @@ object ResponseAssertions {
     fun ReceivedResponse.asList(): List<Map<String, Any>> =
         objectMapper.readValue(body.text, List::class.java) as List<Map<String, Any>>
 
-    fun Any.json() = objectMapper.writeValueAsString(this)
+    fun Any.json(): String = objectMapper.writeValueAsString(this)
 
 }

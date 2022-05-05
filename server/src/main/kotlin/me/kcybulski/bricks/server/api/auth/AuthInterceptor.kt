@@ -2,7 +2,6 @@ package me.kcybulski.bricks.server.api.auth
 
 import mu.KotlinLogging
 import ratpack.handling.Context
-import ratpack.http.Status.UNAUTHORIZED
 import ratpack.registry.Registry
 import java.lang.System.getenv
 

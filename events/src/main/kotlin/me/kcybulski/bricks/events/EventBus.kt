@@ -10,7 +10,6 @@ import me.kcybulski.nexum.eventstore.events.Stream
 import me.kcybulski.nexum.eventstore.events.StreamId
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
 import mu.KotlinLogging
-import java.util.concurrent.Executors
 import java.util.concurrent.Executors.newSingleThreadExecutor
 import kotlin.reflect.KClass
 
