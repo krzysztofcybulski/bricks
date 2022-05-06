@@ -5,9 +5,7 @@ import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
 import me.kcybulski.bricks.server.api.auth.AuthInterceptor
 import me.kcybulski.bricks.server.api.bots.BotsApi
 import me.kcybulski.bricks.server.api.games.GamesApi
-import me.kcybulski.bricks.server.api.games.GamesApiV2
 import me.kcybulski.bricks.server.api.lobbies.LobbiesListApi
-import me.kcybulski.bricks.server.api.lobbies.LobbiesListApiV2
 import ratpack.error.ClientErrorHandler
 import ratpack.error.ServerErrorHandler
 import ratpack.handling.Chain
@@ -18,9 +16,7 @@ import ratpack.server.RatpackServer
 
 class Server(
     private val lobbiesApi: LobbiesListApi,
-    private val lobbiesApiv2: LobbiesListApiV2,
     private val gamesApi: GamesApi,
-    private val gamesApiv2: GamesApiV2,
     private val botsApi: BotsApi,
     private val apiKeysApi: ApiKeysApi,
     private val corsConfiguration: CorsConfiguration,
@@ -44,13 +40,6 @@ class Server(
                 chain
                     .all(corsConfiguration::addCORSHeaders)
                     .all(authInterceptor::intercept)
-                    .prefix("v2") { v2 ->
-                        v2
-                            .prefix("lobbies", lobbiesApiv2::api)
-                            .prefix("games", gamesApiv2::api)
-                            .prefix("bots", botsApi::api)
-                            .prefix("keys", apiKeysApi::api)
-                    }
                     .prefix("lobbies", lobbiesApi::api)
                     .prefix("games", gamesApi::api)
                     .prefix("bots", botsApi::api)

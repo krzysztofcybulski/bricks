@@ -32,7 +32,7 @@ private fun LobbyView.toResponse(status: String, games: List<GameView> = emptyLi
     LobbyWithStateResponse(
         name = name,
         image = image,
-        players = players.map { PlayerResponse(it.name, it.avatarUrl) },
+        players = emptyList(),
         status = status,
         games = games.map(GameView::toResponse)
     )

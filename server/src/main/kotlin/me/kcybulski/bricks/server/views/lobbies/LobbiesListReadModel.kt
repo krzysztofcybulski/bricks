@@ -13,9 +13,13 @@ import me.kcybulski.bricks.server.views.lobbies.LobbyView.Player
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.CLOSED
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.IN_GAME
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.OPEN
+import me.kcybulski.bricks.tournament.GameEndedInTournament
+import java.time.Clock
 import java.util.UUID
 
-class LobbiesListReadModel private constructor() {
+class LobbiesListReadModel private constructor(
+    private val clock: Clock = Clock.systemDefaultZone()
+) {
 
     private val memory: MutableMap<String, LobbyView> = mutableMapOf()
 
@@ -33,7 +37,9 @@ class LobbiesListReadModel private constructor() {
             id = event.lobbyId.raw,
             name = event.lobbyName,
             image = Avatars.generateForLobby(event.lobbyId),
-            players = emptyList(),
+            playersCount = 0,
+            gamesCount = 0,
+            createdAt = clock.instant().toString(),
             status = OPEN
         )
     }
@@ -45,13 +51,13 @@ class LobbiesListReadModel private constructor() {
     private fun onPlayerJoinedToLobby(event: PlayerJoinedToLobby) {
         val player = Player(event.player.name, Avatars.generateForPlayer(event.player))
         memory[event.lobbyId.raw.toString()]
-            ?.let { it.copy(players = it.players + player) }
+            ?.let { it.copy(playersCount = it.playersCount + 1) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
 
     private fun onPlayerLeftLobby(event: PlayerLeftLobby) {
         memory[event.lobbyId.raw.toString()]
-            ?.let { it.copy(players = it.players.filter { p -> p.name != event.player.name }) }
+            ?.let { it.copy(playersCount = it.playersCount - 1) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
 
@@ -67,6 +73,12 @@ class LobbiesListReadModel private constructor() {
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
 
+    private fun onGameEnded(event: GameEndedInTournament) {
+        memory[event.tournamentId.toString()]
+            ?.let { it.copy(gamesCount = it.gamesCount + 1)}
+            ?.let { memory[event.tournamentId.toString()] = it }
+    }
+
     companion object {
 
         fun configureInMemory(eventBus: EventBus): LobbiesListReadModel {
@@ -78,6 +90,7 @@ class LobbiesListReadModel private constructor() {
             eventBus.subscribe(PlayerLeftLobby::class, lobbiesViews::onPlayerLeftLobby)
             eventBus.subscribe(LobbyStartedTournament::class, lobbiesViews::onLobbyStartedTournament)
             eventBus.subscribe(LobbyClosed::class, lobbiesViews::onLobbyClosed)
+            eventBus.subscribe(GameEndedInTournament::class, lobbiesViews::onGameEnded)
 
             return lobbiesViews
         }
@@ -90,7 +103,9 @@ data class LobbyView(
     val id: UUID,
     val name: String,
     val image: String,
-    val players: List<Player>,
+    val playersCount: Int,
+    val gamesCount: Int,
+    val createdAt: String,
     val status: Status
 ) {
 

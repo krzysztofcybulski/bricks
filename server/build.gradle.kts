@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":tournament"))
     implementation(project(":test"))
     implementation(project(":shared-web"))
-    implementation(project(":game-history"))
     implementation(project(":bots"))
     implementation(project(":auth"))
     implementation(kotlin("stdlib"))

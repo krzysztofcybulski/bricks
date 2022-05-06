@@ -7,6 +7,7 @@ import me.kcybulski.bricks.game.GameStartedEvent
 import me.kcybulski.bricks.game.GameWonResult
 import me.kcybulski.bricks.game.PlayerMovedEvent
 import me.kcybulski.bricks.game.TieResult
+import me.kcybulski.bricks.server.views.Avatars
 import java.time.Clock
 import java.util.UUID
 
@@ -50,7 +51,8 @@ class GamesHistoryReadModel private constructor(
 
     private fun toPlayerView(identity: Identity) = PlayerView(
         name = identity.name,
-        image = "https://avatars.dicebear.com/api/avataaars/${identity.name}.svg?style=circle"
+        image = Avatars.generateForPlayer(identity),
+        color = Avatars.color(identity.name)
     )
 
     companion object {

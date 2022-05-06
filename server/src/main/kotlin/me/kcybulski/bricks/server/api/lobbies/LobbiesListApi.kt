@@ -1,7 +1,6 @@
 package me.kcybulski.bricks.server.api.lobbies
 
 import me.kcybulski.bricks.events.CommandBus
-import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
 import me.kcybulski.bricks.lobbies.CreateLobbyCommand
 import me.kcybulski.bricks.server.api.auth.authenticated
 import me.kcybulski.bricks.server.api.renderJson
@@ -12,7 +11,6 @@ import ratpack.jackson.Jackson.fromJson
 import ratpack.websocket.WebSockets
 
 class LobbiesListApi(
-    private val gameHistories: GameHistoriesFacade,
     private val lobbiesView: LobbiesListReadModel,
     private val refreshLobbies: RefreshLobbies,
     private val singleLobbyApi: SingleLobbyApi,
@@ -26,7 +24,6 @@ class LobbiesListApi(
                     m.get { c ->
                         lobbiesView
                             .findAllLobbies()
-                            .map { it.toResponse(gameHistories) }
                             .renderJson(c)
                     }
                         .post { c ->

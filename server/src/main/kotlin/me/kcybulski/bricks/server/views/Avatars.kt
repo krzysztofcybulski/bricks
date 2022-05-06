@@ -9,7 +9,8 @@ object Avatars {
 
     fun generateForLobby(id: LobbyId): String = avatarUrl("bottts", id.raw.toString())
 
-    private fun avatarUrl(type: String, seed: String) =
-        "https://avatars.dicebear.com/api/${type}/${seed}.svg?style=circle"
+    fun color(seed: String)= String.format("%06x", 0xFFFFFF and seed.hashCode())
 
+    private fun avatarUrl(type: String, seed: String) =
+        "https://avatars.dicebear.com/api/${type}/${seed}.svg?style=circle&background=%23${color(seed)}"
 }

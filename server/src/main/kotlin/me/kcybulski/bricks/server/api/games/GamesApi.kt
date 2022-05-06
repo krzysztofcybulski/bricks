@@ -1,14 +1,13 @@
 package me.kcybulski.bricks.server.api.games
 
-import me.kcybulski.bricks.gamehistory.GameEventsRenderer
-import me.kcybulski.bricks.gamehistory.GameHistoriesFacade
+import me.kcybulski.bricks.server.api.renderJson
+import me.kcybulski.bricks.server.views.gamehistory.GamesHistoryReadModel
 import ratpack.handling.Chain
 import ratpack.handling.Context
-import ratpack.jackson.Jackson
 import java.util.UUID
 
 class GamesApi(
-    private val gameHistories: GameHistoriesFacade
+    private val gamesHistoryReadModel: GamesHistoryReadModel
 ) {
 
     fun api(chain: Chain) {
@@ -17,12 +16,12 @@ class GamesApi(
 
     private fun singleGameApi(chain: Chain) {
         chain
-            .get("events") { ctx ->
-                gameHistories.game(ctx.gameId)
-                    .getAllEvents()
-                    .map(GameEventsRenderer::toEventResponse)
-                    .let(Jackson::json)
-                    .let(ctx::render)
+            .get { ctx ->
+                gamesHistoryReadModel
+                    .find(ctx.gameId)
+                    ?.renderJson(ctx)
+                    ?: ctx.notFound()
+
             }
     }
 
