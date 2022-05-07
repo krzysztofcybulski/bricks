@@ -1,7 +1,5 @@
 import React from 'react';
-import { Accordion, AccordionPanel, Anchor, Text } from 'grommet';
-import PlayerInList from '../molecules/PlayerInList';
-import ChooserWithAdd from '../molecules/ChooserWithAdd';
+import { Anchor, Text } from 'grommet';
 import HorizontalBox from '../atoms/HorizontalBox';
 
 const SocialLinks = () =>

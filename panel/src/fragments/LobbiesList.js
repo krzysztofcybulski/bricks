@@ -8,7 +8,6 @@ import ProfileHeader from '../components/structures/ProfileHeader';
 import Button from '../components/atoms/Button';
 import { white } from '../utils/colors';
 import ApiKeyGenerator from '../components/structures/ApiKeyGenerator';
-import { Anchor } from 'grommet';
 import SocialLinks from '../components/structures/SocialLinks';
 
 const LobbiesList = ({ createLobby, loadLobbies, lobbies, selectedLobby, selectLobby }) => {
@@ -22,6 +21,7 @@ const LobbiesList = ({ createLobby, loadLobbies, lobbies, selectedLobby, selectL
         if (selectedLobby) {
             selectLobby({ id: selectedLobby.id });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectLobby, lobbies]);
 
     return <VerticalBox pad="medium" justify="between" elevation="medium" height="100%"
