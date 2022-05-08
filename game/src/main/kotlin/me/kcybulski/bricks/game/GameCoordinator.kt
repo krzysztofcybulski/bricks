@@ -23,7 +23,7 @@ class GameCoordinator(
 
     suspend fun play(startingPlayer: Identity, mapSize: Int): EndedGame =
         gamesFactory.createNewGame(players, mapSize)
-            .also { (gameInitialized, game) -> events.send(gameInitialized.toStartedEvent(), game.id.toString()) }
+            .also { (gameInitialized, game) -> events.send(gameInitialized.toStartedEvent(startingPlayer), game.id.toString()) }
             .let { (gameInitialized, game) -> initialize(startingPlayer, game, gameInitialized) }
             .also { game -> events.send(game.toEndedEvent(), game.id.toString()) }
 
@@ -75,11 +75,11 @@ class GameCoordinator(
 
 }
 
-private fun GameInitialized.toStartedEvent() =
+private fun GameInitialized.toStartedEvent(startingPlayer: Identity) =
     GameStartedEvent(
         gameId = gameId,
         size = size,
-        players = players,
+        players = players.withFirst(startingPlayer),
         initialBlocks = initialBlocks
     )
 

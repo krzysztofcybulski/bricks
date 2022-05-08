@@ -4,7 +4,6 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.lobbies.LobbyAdded
 import me.kcybulski.bricks.lobbies.LobbyClosed
 import me.kcybulski.bricks.lobbies.LobbyDeleted
-import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.lobbies.LobbyStartedTournament
 import me.kcybulski.bricks.lobbies.PlayerJoinedToLobby
 import me.kcybulski.bricks.lobbies.PlayerLeftLobby
@@ -25,12 +24,7 @@ class LobbiesListReadModel private constructor(
 
     fun findAllLobbies(): List<LobbyView> =
         memory.values.toList()
-
-    fun findLobby(id: LobbyId): LobbyView? =
-        memory[id.raw.toString()]
-
-    fun findLobby(name: String): LobbyView? =
-        memory.values.find { it.name == name }
+            .sortedByDescending { it.createdAt }
 
     private fun onLobbyAdded(event: LobbyAdded) {
         memory[event.lobbyId.raw.toString()] = LobbyView(

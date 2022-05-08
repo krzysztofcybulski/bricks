@@ -24,7 +24,7 @@ const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
                                          addBot={(botId) => addBot({ botId, lobbyId: lobby.id })}/>
                             <TournamentSettings setSettings={setSettings}/>
                         </>
-                        : <PlayersList players={lobby.players}/>
+                        : <PlayersList players={lobby.players.map(p => ({ ...p, text: `${p.points} points` }))}/>
                     }
                 </VerticalBox>
                 <VerticalBox flex="grow" justify="end" margin={{ top: 'large' }}>

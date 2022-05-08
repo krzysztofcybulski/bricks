@@ -5,9 +5,9 @@ data class PlayersPair(
     val second: Identity
 ) {
 
-    private fun swap() = PlayersPair(first, second)
-
     operator fun contains(player: Identity) = first == player || second == player
+
+    fun withFirst(player: Identity) = if(player == first) this else swap()
 
     infix fun not(identity: Identity) = when(identity) {
         first -> second
@@ -15,6 +15,6 @@ data class PlayersPair(
         else -> throw IllegalArgumentException("No such identity")
     }
 
-    fun names() = first.name to second.name
+    private fun swap() = PlayersPair(second, first)
 
 }

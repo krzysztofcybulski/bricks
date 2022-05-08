@@ -42,7 +42,7 @@ export const createLobby = createAsyncThunk(
 
 export const startTournament = createAsyncThunk(
     'lobbies/startTournament',
-    async ({ lobbyId, settings: { sizes, initTime, moveTime } }, thunkAPI) => {
+    async ({ lobbyId, settings: { sizes, initTime, moveTime } }) => {
         await post(`lobbies/${lobbyId}/tournaments`, {
             sizes,
             initTime,
@@ -61,8 +61,11 @@ const lobbiesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(selectLobby.pending, (state, action) => {
-                state.loadingLobby = true;
+            .addCase(selectLobby.pending, (state, { meta }) => {
+                const { arg: { id } } = meta;
+                if(state.selected?.id !== id) {
+                    state.loadingLobby = true;
+                }
             })
             .addCase(selectLobby.fulfilled, (state, action) => {
                 state.selected = action.payload;
