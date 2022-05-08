@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import Text from '../components/atoms/Text';
 import { useAuth0 } from '@auth0/auth0-react';
 import VerticalBox from '../components/atoms/VerticalBox';
 import Lottie from 'react-lottie';
