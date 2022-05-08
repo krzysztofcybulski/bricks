@@ -1,12 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { get, post } from '../api';
 
-export const fetchLobbies = createAsyncThunk(
-    'lobbies/fetch',
+export const initData = createAsyncThunk(
+    'lobbies/init',
     async () => {
         const lobbies = await get('lobbies');
         const bots = await get('bots');
         return ({ lobbies, bots });
+    }
+);
+
+export const fetchLobbies = createAsyncThunk(
+    'lobbies/fetch',
+    async () => {
+        return await get('lobbies');
     }
 );
 
@@ -49,20 +56,25 @@ const lobbiesSlice = createSlice({
     initialState: {
         all: [],
         allBots: [],
-        selected: null
+        selected: null,
+        loaded: false
     },
     extraReducers: (builder) => {
         builder
+            .addCase(selectLobby.pending, (state, action) => {
+                state.loadingLobby = true;
+            })
             .addCase(selectLobby.fulfilled, (state, action) => {
                 state.selected = action.payload;
+                state.loadingLobby = false;
             })
-            .addCase(fetchLobbies.pending, (state) => {
-                state.loading = 'pending';
-            })
-            .addCase(fetchLobbies.fulfilled, (state, { payload: { bots, lobbies } }) => {
-                state.loading = 'idle';
+            .addCase(initData.fulfilled, (state, { payload: { bots, lobbies } }) => {
+                state.loaded = true;
                 state.all = lobbies;
                 state.allBots = bots;
+            })
+            .addCase(fetchLobbies.fulfilled, (state, { payload }) => {
+                state.all = payload;
             });
     }
 });

@@ -3,18 +3,19 @@ import NotificationContainer from 'react-notifications/lib/NotificationContainer
 import { useEffect } from 'react';
 import { wsAddress } from '../redux/api';
 import { NotificationManager } from 'react-notifications';
-import { fetchLobbies } from '../redux/slices/lobbiesReducer';
+import { fetchLobbies, initData } from '../redux/slices/lobbiesReducer';
 
-const MessageDispatcher = ({ onMessage, children }) => {
+const MessageDispatcher = ({ initData, onMessage, children }) => {
     useEffect(() => {
         const ws = new WebSocket(`${wsAddress}/lobbies/updates`);
         ws.onmessage = event => {
             onMessage(JSON.parse(event.data));
         };
+        initData();
         return () => {
             ws.close();
         }
-    }, [onMessage]);
+    }, [initData, onMessage]);
 
     return <>
         <NotificationContainer/>
@@ -26,6 +27,7 @@ const MessageDispatcher = ({ onMessage, children }) => {
 export default connect(
     null,
     dispatch => ({
+        initData: () => dispatch(initData()),
         onMessage: (message) => {
             switch (message.type) {
                 case "GAME_ENDED":

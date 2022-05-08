@@ -11,12 +11,12 @@ import { white } from '../utils/colors';
 
 const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
     const [settings, setSettings] = useState();
-    return <VerticalBox pad="medium"
-                        elevation="medium" height="100%" style={{ backgroundColor: white }}>
+    return lobby && <VerticalBox pad="medium"
+                                 elevation="medium" height="100%" style={{ backgroundColor: white }}>
         <LoadingContainer loadIf={loading}>
-            {lobby && <>
+            <>
                 <AvatarHeader image={lobby.image} text={lobby.name}/>
-                <VerticalBox gap="medium" overflow={{ vertical: "scroll", horizontal: "hidden" }} >
+                <VerticalBox gap="medium" overflow={{ vertical: 'scroll', horizontal: 'hidden' }}>
                     {lobby.status === 'OPEN'
                         ? <>
                             <PlayersList players={lobby.players}
@@ -27,21 +27,21 @@ const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
                         : <PlayersList players={lobby.players}/>
                     }
                 </VerticalBox>
-                <VerticalBox flex="grow" justify="end" margin={{ top: "large" }}>
+                <VerticalBox flex="grow" justify="end" margin={{ top: 'large' }}>
                     {lobby.status === 'OPEN' &&
                         <Button onClick={() => startTournament({
                             lobbyId: lobby.id,
                             settings
                         })}>Start tournament</Button>}
                 </VerticalBox>
-            </>}
+            </>
         </LoadingContainer>
     </VerticalBox>;
 };
 
 export default connect(
     ({ lobbies }) => ({
-        loading: !lobbies?.selected?.players,
+        loading: lobbies.loadingLobby,
         lobby: lobbies?.selected,
         bots: lobbies?.allBots
     }),

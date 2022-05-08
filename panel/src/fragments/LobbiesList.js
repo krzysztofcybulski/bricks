@@ -3,19 +3,15 @@ import VerticalBox from '../components/atoms/VerticalBox';
 import Search from '../components/molecules/Search';
 import LobbyChooser from '../components/structures/LobbyChooser';
 import { connect } from 'react-redux';
-import { createLobby, fetchLobbies, selectLobby } from '../redux/slices/lobbiesReducer';
+import { createLobby, selectLobby } from '../redux/slices/lobbiesReducer';
 import ProfileHeader from '../components/structures/ProfileHeader';
 import Button from '../components/atoms/Button';
 import { white } from '../utils/colors';
 import ApiKeyGenerator from '../components/structures/ApiKeyGenerator';
 import SocialLinks from '../components/structures/SocialLinks';
 
-const LobbiesList = ({ createLobby, loadLobbies, lobbies, selectedLobby, selectLobby }) => {
+const LobbiesList = ({ createLobby, lobbies, selectedLobby, selectLobby }) => {
     const [search, setSearch] = useState('');
-
-    useEffect(() => {
-        loadLobbies();
-    }, [loadLobbies]);
 
     useEffect(() => {
         if (selectedLobby) {
@@ -49,7 +45,6 @@ export default connect(
         selectedLobby: selected
     }),
     (dispatch) => ({
-        loadLobbies: () => dispatch(fetchLobbies()),
         selectLobby: ({ id }) => dispatch(selectLobby({ id })),
         createLobby: () => dispatch(createLobby())
     })

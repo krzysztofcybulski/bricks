@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import AuthProvider from './utils/AuthProvider';
 import MessageDispatcher from './utils/MessageDispatcher';
+import Loading from './utils/Loading';
 
 const customTheme = deepMerge(grommet, {
     box: {
@@ -38,7 +39,9 @@ root.render(
             <Provider store={store}>
                 <MessageDispatcher>
                     <AuthProvider>
-                        <App/>
+                        <Loading>
+                            <App/>
+                        </Loading>
                     </AuthProvider>
                 </MessageDispatcher>
             </Provider>
