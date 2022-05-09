@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "me.kcybulski.bricks"
-version = "2.1"
+version = "2.2"
 
 repositories {
     mavenCentral()
@@ -34,7 +34,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             artifactId = "bricks-game"
-            version = "2.1"
+            version = "2.2"
             pom {
                 name.set("bricks-game")
                 url.set("https://github.com/krzysztofcybulski/bricks")
