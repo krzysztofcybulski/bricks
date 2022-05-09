@@ -34,7 +34,6 @@ import mu.KotlinLogging
 
 internal class WSBricksClient(
     private val http: HttpClient,
-    private val apiKey: String,
     private val host: String,
     private val port: Int,
     private val jackson: ObjectMapper
@@ -42,12 +41,12 @@ internal class WSBricksClient(
 
     private val logger = KotlinLogging.logger {}
 
-    suspend fun connect(lobby: String, bricks: Algorithm) = withContext(SupervisorJob()) {
+    suspend fun connect(apiKey: String, lobbyId: String, bricks: Algorithm) = withContext(SupervisorJob()) {
         http.webSocket(
             method = Get,
             host = host,
             port = port,
-            path = "/lobbies/${lobby}/game",
+            path = "/lobbies/${lobbyId}/game",
             { parameter("key", apiKey) }
         ) {
             sendJson(RegisterMessage(bricks.identity.name))

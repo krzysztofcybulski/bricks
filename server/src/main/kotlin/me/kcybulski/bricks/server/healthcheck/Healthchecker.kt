@@ -23,7 +23,10 @@ class Healthchecker private constructor(
             val healthStatuses = collectHealthStatuses()
             healthStatuses
                 .filter { (_, v) -> v is NotHealthy }
-                .forEach { (k, _) -> commandBus.send(KickPlayerCommand(k.lobbyId, k.identity)) }
+                .forEach { (k, _) ->
+                    websocketsRegistry.remove(k)
+                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
+                }
             refreshLobbies.reportPing(
                 healthStatuses
                     .filterValues { it is Healthy }

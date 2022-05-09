@@ -13,6 +13,10 @@ class WebsocketsRegistry(
         players += playerConnection
     }
 
+    fun remove(playerConnection: PlayerConnection) {
+        players -= playerConnection
+    }
+
     fun find(webSocket: WebSocket) = players.find { it.webSocket == webSocket }
 
 }

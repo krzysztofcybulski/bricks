@@ -3,18 +3,13 @@ package me.kcybulski.bricks.client
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
+import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.jackson.jackson
-import kotlinx.coroutines.runBlocking
-import me.kcybulski.bricks.api.Block
-import me.kcybulski.bricks.api.Brick
-import me.kcybulski.bricks.api.DuoBrick
-import me.kcybulski.bricks.api.GameInitialized
-import me.kcybulski.bricks.api.MoveTrigger
 
-class BricksWebClient(apiKey: String, host: String, port: Int = 80) {
+class BricksWebClient(host: String, port: Int = 80) {
 
     private val jackson = jacksonObjectMapper()
 
@@ -27,19 +22,19 @@ class BricksWebClient(apiKey: String, host: String, port: Int = 80) {
         }
     }
 
-    private val websocket = WSBricksClient(httpClient, apiKey, host, port, jackson)
+    private val websocket = WSBricksClient(httpClient, host, port, jackson)
 
     private val rest = RestBricksClient(httpClient, host, port)
 
-    suspend fun register(lobby: String, algorithm: UserAlgorithm) {
-        websocket.connect(lobby, algorithm)
+    suspend fun register(apiKey: String, lobbyId: String, algorithm: UserAlgorithm) {
+        websocket.connect(apiKey, lobbyId, algorithm)
     }
 
     suspend fun register(algorithm: UserAlgorithm) {
         val lobbies = rest.getLobbies()
             .filter { it.isOpen() }
 
-        if(lobbies.isEmpty()) {
+        if (lobbies.isEmpty()) {
             println("No open lobbies found")
             return
         }
@@ -48,25 +43,34 @@ class BricksWebClient(apiKey: String, host: String, port: Int = 80) {
         lobbies.forEachIndexed { i, lobby ->
             println("[$i] ${lobby.name}")
         }
-        register(lobbies[readLine()!!.toInt()].name, algorithm)
+
+        val lobbyIndex = readLine()!!.toInt()
+
+        if(lobbyIndex >= lobbies.size) {
+            println("Invalid lobby")
+            return register(algorithm)
+        }
+
+        try {
+            return register(
+                getApiKey(),
+                lobbies[lobbyIndex].id,
+                algorithm
+            )
+        } catch(e: NoTransformationFoundException) {
+            println("Invalid api key")
+            return register(algorithm)
+        }
     }
-}
 
-fun main() = runBlocking {
-    BricksWebClient("9590ff1106844852a72f25dd8f5bfd57", "localhost", 5050)
-        .register(MyAlgo)
-}
-
-object MyAlgo: UserAlgorithm() {
-    override suspend fun move(opponentMoved: MoveTrigger.OpponentMoved): Brick {
-        return DuoBrick.unsafe(Block(2, 0), Block(2, 1))
+    private fun getApiKey(): String {
+        val envApiKey = System.getenv("BRICKS_API_KEY")
+        return if(envApiKey != null) {
+            println("Loaded API_KEY from environment variable")
+            envApiKey
+        } else {
+            println("Enter your api key:")
+            readLine()!!
+        }
     }
-
-    override suspend fun firstMove(): Brick {
-        return DuoBrick.unsafe(Block(0, 0), Block(1, 0))
-    }
-
-    override suspend fun initialize(gameInitialized: GameInitialized) {
-    }
-
 }

@@ -17,6 +17,7 @@ internal class RestBricksClient(
 }
 
 internal data class Lobby(
+    val id: String,
     val name: String,
     val status: String
 ) {

@@ -8,6 +8,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.kcybulski.bricks.auth.ApiUser
+import me.kcybulski.bricks.events.CommandBus
+import me.kcybulski.bricks.lobbies.JoinLobbyCommand
 import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.server.PlayerConnection
 import me.kcybulski.bricks.web.ImHealthy
@@ -25,13 +27,16 @@ class WSHandler(
     private val registry: WebsocketsRegistry,
     private val apiUser: ApiUser,
     private val coroutine: CoroutineScope,
+    private val commandBus: CommandBus,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : WebSocketHandler<String> {
 
     private val logger = KotlinLogging.logger {}
 
     override fun onOpen(webSocket: WebSocket): String? {
-        registry.register(PlayerConnection(apiUser.name, lobbyId, webSocket))
+        val playerConnection = PlayerConnection(apiUser.name, lobbyId, webSocket)
+        registry.register(playerConnection)
+        commandBus.send(JoinLobbyCommand(lobbyId, playerConnection))
         return null
     }
 
