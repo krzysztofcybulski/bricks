@@ -16,7 +16,7 @@ class ApiKeysApi(
         chain
             .post { ctx ->
                 authenticated(ctx) { user ->
-                    apiKeys.generateKey(ApiUser(user.id))
+                    apiKeys.generateKey(ApiUser(user.id, user.name))
                         .let { ApiKeyResponse(it.raw) }
                         .renderJson(ctx)
                 }

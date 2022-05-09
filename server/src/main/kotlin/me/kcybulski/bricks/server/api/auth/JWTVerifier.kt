@@ -10,6 +10,8 @@ import com.google.common.net.HttpHeaders.AUTHORIZATION
 import ratpack.handling.Context
 import java.security.interfaces.RSAPublicKey
 
+private const val NICKNAME_CLAIM = "https://bricks.kcybulski.me/nickname"
+
 class JWTVerifier(
     domain: String,
     keyId: String,
@@ -34,7 +36,7 @@ class JWTVerifier(
     private fun verify(token: String): VerificationResult =
         try {
             val jwt: DecodedJWT = verifier.verify(token)
-            Verified(jwt.subject, jwt.subject) //TODO
+            Verified(jwt.subject, jwt.claims[NICKNAME_CLAIM]?.asString() ?: jwt.subject)
         } catch (exception: JWTVerificationException) {
             NotVerified
         }

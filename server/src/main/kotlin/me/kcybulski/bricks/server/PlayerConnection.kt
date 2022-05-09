@@ -26,7 +26,6 @@ import java.lang.System.currentTimeMillis
 
 class PlayerConnection(
     name: String,
-    val lobbyId: LobbyId,
     val webSocket: WebSocket,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {

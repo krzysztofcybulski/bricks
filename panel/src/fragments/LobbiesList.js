@@ -9,6 +9,7 @@ import Button from '../components/atoms/Button';
 import { white } from '../utils/colors';
 import ApiKeyGenerator from '../components/structures/ApiKeyGenerator';
 import SocialLinks from '../components/structures/SocialLinks';
+import { hasPermission } from '../redux/auth';
 
 const LobbiesList = ({ createLobby, lobbies, selectedLobby, selectLobby }) => {
     const [search, setSearch] = useState('');
@@ -33,7 +34,7 @@ const LobbiesList = ({ createLobby, lobbies, selectedLobby, selectLobby }) => {
         </VerticalBox>
         <VerticalBox gap="small">
             <ApiKeyGenerator />
-            <Button onClick={createLobby}>Create lobby</Button>
+            { hasPermission("add:lobbies") && <Button onClick={createLobby}>Create lobby</Button> }
             <SocialLinks />
         </VerticalBox>
     </VerticalBox>;

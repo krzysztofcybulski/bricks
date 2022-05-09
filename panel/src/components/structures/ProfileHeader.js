@@ -20,13 +20,13 @@ const ProfileHeader = () => {
     }, [getAccessTokenSilently, isAuthenticated]);
 
     return isAuthenticated
-        ? <AuthenticatedHeader user={user} logout={logout}/>
+        ? <AuthenticatedHeader user={user} logout={() => logout({ returnTo: window.location.origin })}/>
         : <UnauthenticatedHeader login={loginWithRedirect}/>;
 };
 
 const AuthenticatedHeader = ({ user, logout }) =>
     <HorizontalBox justify="between" align="center">
-        <Avatar url={user.picture} size="medium" />
+        <Avatar url={user.picture} size="medium"/>
         <Text>{user.name}</Text>
         <Logout onClick={logout} cursor="pointer"/>
     </HorizontalBox>;

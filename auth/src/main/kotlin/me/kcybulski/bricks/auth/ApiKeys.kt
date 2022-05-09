@@ -8,7 +8,7 @@ class ApiKeys internal constructor(
 
     fun generateKey(user: ApiUser): ApiKey {
         val key = generator.generateKey()
-        repository.saveKey(user.name, key.raw)
+        repository.saveKey(user, key.raw)
         return key
     }
 
@@ -17,7 +17,7 @@ class ApiKeys internal constructor(
     }
 
     fun authorize(key: ApiKey): ApiUser? =
-        repository.getUser(key.raw)?.let(::ApiUser)
+        repository.getUser(key.raw)
 
     companion object {
 
@@ -30,6 +30,6 @@ class ApiKeys internal constructor(
 
 }
 
-data class ApiUser(val name: String)
+data class ApiUser(val id: String, val name: String)
 
 data class ApiKey(val raw: String)

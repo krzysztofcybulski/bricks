@@ -8,6 +8,7 @@ import LoadingContainer from '../components/molecules/LoadingContainer';
 import TournamentSettings from '../components/structures/TournamentSettings';
 import { addBot, startTournament } from '../redux/slices/lobbiesReducer';
 import { white } from '../utils/colors';
+import { hasPermission } from '../redux/auth';
 
 const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
     const [settings, setSettings] = useState();
@@ -22,13 +23,15 @@ const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
                             <PlayersList players={lobby.players.map(p => ({ ...p, text: `${p.ping || 0} ms` }))}
                                          bots={bots}
                                          addBot={(botId) => addBot({ botId, lobbyId: lobby.id })}/>
-                            <TournamentSettings setSettings={setSettings}/>
+                            { hasPermission('start:tournaments') && <TournamentSettings setSettings={setSettings}/> }
                         </>
                         : <PlayersList players={lobby.players.map(p => ({ ...p, text: `${p.points} points` }))}/>
                     }
                 </VerticalBox>
                 <VerticalBox flex="grow" justify="end" margin={{ top: 'large' }}>
-                    {lobby.status === 'OPEN' &&
+                    {
+                        lobby.status === 'OPEN' &&
+                        hasPermission('start:tournaments') &&
                         <Button onClick={() => startTournament({
                             lobbyId: lobby.id,
                             settings

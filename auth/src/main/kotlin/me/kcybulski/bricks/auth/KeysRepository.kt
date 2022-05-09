@@ -2,9 +2,9 @@ package me.kcybulski.bricks.auth
 
 internal interface KeysRepository {
 
-    fun saveKey(user: String, key: String)
+    fun saveKey(user: ApiUser, key: String)
     fun deleteKey(key: String)
-    fun getUser(key: String): String?
+    fun getUser(key: String): ApiUser?
 
 }
 

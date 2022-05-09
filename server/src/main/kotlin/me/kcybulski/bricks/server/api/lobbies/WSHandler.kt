@@ -34,7 +34,7 @@ class WSHandler(
     private val logger = KotlinLogging.logger {}
 
     override fun onOpen(webSocket: WebSocket): String? {
-        val playerConnection = PlayerConnection(apiUser.name, lobbyId, webSocket)
+        val playerConnection = PlayerConnection(apiUser.name, webSocket)
         registry.register(playerConnection)
         commandBus.send(JoinLobbyCommand(lobbyId, playerConnection))
         return null
