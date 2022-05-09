@@ -15,18 +15,18 @@ class Healthchecker private constructor(
     private val commandBus: CommandBus,
     private val refreshLobbies: RefreshLobbies,
     private val coroutine: CoroutineScope = CoroutineScope(newSingleThreadContext("healthcheck")),
-    private val healthcheckDelay: Long = 5000L
+    private val healthcheckDelay: Long = 500L
 ) {
 
     fun start() = coroutine.launch {
         while (true) {
             val healthStatuses = collectHealthStatuses()
-            healthStatuses
-                .filter { (_, v) -> v is NotHealthy }
-                .forEach { (k, _) ->
-                    websocketsRegistry.remove(k)
-                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
-                }
+//            healthStatuses
+//                .filter { (_, v) -> v is NotHealthy }
+//                .forEach { (k, _) ->
+//                    websocketsRegistry.remove(k)
+//                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
+//                }
             refreshLobbies.reportPing(
                 healthStatuses
                     .filterValues { it is Healthy }

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { wsAddress } from '../redux/api';
 import { NotificationManager } from 'react-notifications';
 import { fetchLobbies, initData } from '../redux/slices/lobbiesReducer';
+import { reportPings } from '../redux/slices/playersReducer';
 
 const MessageDispatcher = ({ initData, onMessage, children }) => {
     useEffect(() => {
@@ -54,6 +55,7 @@ export default connect(
                     NotificationManager.info(`Tournament ended`);
                     break;
                 case "REPORT_PING":
+                    dispatch(reportPings({ players: message.players }));
                     break;
                 default: break;
             }

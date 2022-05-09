@@ -19,7 +19,7 @@ const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
                 <VerticalBox gap="medium" overflow={{ vertical: 'scroll', horizontal: 'hidden' }}>
                     {lobby.status === 'OPEN'
                         ? <>
-                            <PlayersList players={lobby.players}
+                            <PlayersList players={lobby.players.map(p => ({ ...p, text: `${p.ping || 0} ms` }))}
                                          bots={bots}
                                          addBot={(botId) => addBot({ botId, lobbyId: lobby.id })}/>
                             <TournamentSettings setSettings={setSettings}/>
@@ -40,9 +40,12 @@ const LobbyDetails = ({ lobby, bots, addBot, loading, startTournament }) => {
 };
 
 export default connect(
-    ({ lobbies }) => ({
+    ({ lobbies, players }) => ({
         loading: lobbies.loadingLobby,
-        lobby: lobbies?.selected,
+        lobby: lobbies.selected && {
+            ...lobbies.selected,
+            players: lobbies.selected.players.map(p => ({ ...p, ...players[p.name] }))
+        },
         bots: lobbies?.allBots
     }),
     (dispatch) => ({
