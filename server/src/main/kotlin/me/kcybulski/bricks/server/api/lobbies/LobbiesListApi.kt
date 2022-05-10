@@ -3,8 +3,8 @@ package me.kcybulski.bricks.server.api.lobbies
 import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.lobbies.CreateLobbyCommand
 import me.kcybulski.bricks.server.api.auth.authenticated
-import me.kcybulski.bricks.server.api.renderJson
 import me.kcybulski.bricks.server.healthcheck.RefreshLobbies
+import me.kcybulski.bricks.server.renderJson
 import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
 import ratpack.handling.Chain
 import ratpack.jackson.Jackson.fromJson

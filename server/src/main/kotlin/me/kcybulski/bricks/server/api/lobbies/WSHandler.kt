@@ -11,7 +11,7 @@ import me.kcybulski.bricks.auth.ApiUser
 import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.lobbies.JoinLobbyCommand
 import me.kcybulski.bricks.lobbies.LobbyId
-import me.kcybulski.bricks.server.PlayerConnection
+import me.kcybulski.bricks.server.api.PlayerConnection
 import me.kcybulski.bricks.web.ImHealthy
 import me.kcybulski.bricks.web.MoveMessage
 import me.kcybulski.bricks.web.ReadyMessage
@@ -34,7 +34,7 @@ class WSHandler(
     private val logger = KotlinLogging.logger {}
 
     override fun onOpen(webSocket: WebSocket): String? {
-        val playerConnection = PlayerConnection(apiUser.name, webSocket)
+        val playerConnection = PlayerConnection(apiUser.name, lobbyId, webSocket)
         registry.register(playerConnection)
         commandBus.send(JoinLobbyCommand(lobbyId, playerConnection))
         return null

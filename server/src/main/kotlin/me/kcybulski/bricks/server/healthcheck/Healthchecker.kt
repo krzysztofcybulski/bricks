@@ -6,8 +6,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import me.kcybulski.bricks.events.CommandBus
 import me.kcybulski.bricks.lobbies.KickPlayerCommand
-import me.kcybulski.bricks.server.Healthy
-import me.kcybulski.bricks.server.NotHealthy
+import me.kcybulski.bricks.server.api.Healthy
+import me.kcybulski.bricks.server.api.NotHealthy
 import me.kcybulski.bricks.server.api.lobbies.WebsocketsRegistry
 
 class Healthchecker private constructor(
@@ -21,12 +21,12 @@ class Healthchecker private constructor(
     fun start() = coroutine.launch {
         while (true) {
             val healthStatuses = collectHealthStatuses()
-//            healthStatuses
-//                .filter { (_, v) -> v is NotHealthy }
-//                .forEach { (k, _) ->
-//                    websocketsRegistry.remove(k)
-//                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
-//                }
+            healthStatuses
+                .filter { (_, v) -> v is NotHealthy }
+                .forEach { (k, _) ->
+                    websocketsRegistry.remove(k)
+                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
+                }
             refreshLobbies.reportPing(
                 healthStatuses
                     .filterValues { it is Healthy }

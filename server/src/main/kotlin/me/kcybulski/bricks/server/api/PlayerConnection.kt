@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server
+package me.kcybulski.bricks.server.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -26,6 +26,7 @@ import java.lang.System.currentTimeMillis
 
 class PlayerConnection(
     name: String,
+    val lobbyId: LobbyId,
     val webSocket: WebSocket,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {
@@ -71,7 +72,7 @@ class PlayerConnection(
     suspend fun healthStatus(): HealthStatus {
         send(HowAreYou)
         val time = currentTimeMillis()
-        return withTimeoutOrNull(1000) { healthChannel.receive() }
+        return withTimeoutOrNull(2000) { healthChannel.receive() }
             ?.let { Healthy(currentTimeMillis() - time) }
             ?: NotHealthy
     }

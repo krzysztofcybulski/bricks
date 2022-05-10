@@ -1,4 +1,4 @@
-package me.kcybulski.bricks.server
+package me.kcybulski.bricks.server.infrastructure
 
 import mu.KotlinLogging
 import ratpack.error.ClientErrorHandler

@@ -4,7 +4,7 @@ import me.kcybulski.bricks.auth.ApiKey
 import me.kcybulski.bricks.auth.ApiKeys
 import me.kcybulski.bricks.auth.ApiUser
 import me.kcybulski.bricks.server.api.auth.authenticated
-import me.kcybulski.bricks.server.api.renderJson
+import me.kcybulski.bricks.server.renderJson
 import ratpack.handling.Chain
 import ratpack.handling.Context
 
