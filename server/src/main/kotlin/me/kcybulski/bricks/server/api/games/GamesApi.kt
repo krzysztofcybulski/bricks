@@ -1,6 +1,6 @@
 package me.kcybulski.bricks.server.api.games
 
-import me.kcybulski.bricks.server.renderJson
+import me.kcybulski.bricks.server.api.renderJson
 import me.kcybulski.bricks.server.views.gamehistory.GamesHistoryReadModel
 import ratpack.handling.Chain
 import ratpack.handling.Context

@@ -9,7 +9,7 @@ import me.kcybulski.bricks.lobbies.LobbyId
 import me.kcybulski.bricks.lobbies.StartTournamentCommand
 import me.kcybulski.bricks.server.api.apikeys.apiAuthenticated
 import me.kcybulski.bricks.server.api.auth.authenticated
-import me.kcybulski.bricks.server.renderJson
+import me.kcybulski.bricks.server.api.renderJson
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsReadModel
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsView
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsView.Status.OPEN
@@ -36,10 +36,7 @@ class SingleLobbyApi(
             .get("game") { ctx ->
                 apiAuthenticated(apiKeys, ctx) { apiUser ->
                     openLobby(ctx) { lobby ->
-                        WebSockets.websocket(
-                            ctx,
-                            WSHandler(LobbyId(lobby.id), websocketsRegistry, apiUser, coroutine, commandBus)
-                        )
+                        WebSockets.websocket(ctx, WSHandler(LobbyId(lobby.id), websocketsRegistry, apiUser, coroutine, commandBus))
                     }
                 }
             }

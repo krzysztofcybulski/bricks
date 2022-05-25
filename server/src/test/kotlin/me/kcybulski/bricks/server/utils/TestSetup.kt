@@ -59,6 +59,10 @@ class TestServer(configuration: Configuration) : AutoCloseable {
                     }
             }
 
+    suspend fun websocket(path: String, vararg params: Pair<String, String>) =
+        TestWebsocket(app.address.host, app.address.port, params.toList())
+            .connect(path)
+
     override fun close() {
         app.close()
     }

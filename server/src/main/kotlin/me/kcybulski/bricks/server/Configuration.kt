@@ -9,6 +9,7 @@ import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.events.EventsModule
 import me.kcybulski.bricks.lobbies.LobbiesModule
 import me.kcybulski.bricks.server.api.CorsConfiguration
+import me.kcybulski.bricks.server.api.Server
 import me.kcybulski.bricks.server.api.apikeys.ApiKeysApi
 import me.kcybulski.bricks.server.api.auth.AuthInterceptor
 import me.kcybulski.bricks.server.api.bots.BotsApi
@@ -46,7 +47,7 @@ data class Configuration internal constructor(
             val websocketsRegistry = WebsocketsRegistry()
 
             val eventsModule = EventsModule(
-                eventBus = EventBus(eventStore),
+                eventBus = EventBus(),
                 commandBus = CommandBus(),
                 initializers = listOf(
                     { eventBus, commandBus, _ -> TournamentsModule.configure(eventBus, commandBus) },

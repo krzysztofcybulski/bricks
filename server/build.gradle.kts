@@ -29,11 +29,15 @@ dependencies {
     implementation("com.github.javafaker:javafaker:1.0.2")
     implementation("com.auth0:java-jwt:3.19.1")
     implementation("com.auth0:jwks-rsa:0.21.1")
-    implementation("io.ratpack:ratpack-dropwizard-metrics:1.9.0")
 
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.0.M3")
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.0.M3")
     testImplementation("io.ratpack:ratpack-test:1.9.0")
+    testImplementation("io.ktor:ktor-client-websockets:2.0.0")
+    testImplementation("io.ktor:ktor-client-core:2.0.0")
+    testImplementation("io.ktor:ktor-client-cio:2.0.0")
+    testImplementation("io.ktor:ktor-client-content-negotiation:2.0.0")
+    testImplementation("io.ktor:ktor-serialization-jackson:2.0.0")
 }
 
 application {
