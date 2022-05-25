@@ -47,7 +47,7 @@ data class Configuration internal constructor(
             val websocketsRegistry = WebsocketsRegistry()
 
             val eventsModule = EventsModule(
-                eventBus = EventBus(),
+                eventBus = EventBus(eventStore),
                 commandBus = CommandBus(),
                 initializers = listOf(
                     { eventBus, commandBus, _ -> TournamentsModule.configure(eventBus, commandBus) },

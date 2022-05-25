@@ -21,12 +21,12 @@ class Healthchecker private constructor(
     fun start() = coroutine.launch {
         while (true) {
             val healthStatuses = collectHealthStatuses()
-//            healthStatuses
-//                .filter { (_, v) -> v is NotHealthy }
-//                .forEach { (k, _) ->
-//                    websocketsRegistry.remove(k)
-//                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
-//                }
+            healthStatuses
+                .filter { (_, v) -> v is NotHealthy }
+                .forEach { (k, _) ->
+                    websocketsRegistry.remove(k)
+                    commandBus.send(KickPlayerCommand(k.lobbyId, k.identity))
+                }
             refreshLobbies.reportPing(
                 healthStatuses
                     .filterValues { it is Healthy }

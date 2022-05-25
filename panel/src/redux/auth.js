@@ -5,6 +5,6 @@ export const hasPermission = (permission) => {
     if (!token) {
         return false;
     }
-    const { permissions } = jwt_decode(localStorage.getItem('token'));
-    return permissions.indexOf(permission) >= 0;
+    const { permissions } = jwt_decode(token);
+    return (permissions || []).indexOf(permission) >= 0;
 };

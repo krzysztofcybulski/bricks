@@ -36,7 +36,10 @@ class SingleLobbyApi(
             .get("game") { ctx ->
                 apiAuthenticated(apiKeys, ctx) { apiUser ->
                     openLobby(ctx) { lobby ->
-                        WebSockets.websocket(ctx, WSHandler(LobbyId(lobby.id), websocketsRegistry, apiUser, coroutine, commandBus))
+                        WebSockets.websocket(
+                            ctx,
+                            WSHandler(LobbyId(lobby.id), websocketsRegistry, apiUser, coroutine, commandBus)
+                        )
                     }
                 }
             }

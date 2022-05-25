@@ -26,6 +26,7 @@ import java.lang.System.currentTimeMillis
 
 class PlayerConnection(
     name: String,
+    val lobbyId: LobbyId,
     val webSocket: WebSocket,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : Algorithm {
@@ -71,7 +72,7 @@ class PlayerConnection(
     suspend fun healthStatus(): HealthStatus {
         send(HowAreYou)
         val time = currentTimeMillis()
-        return withTimeoutOrNull(1000) { healthChannel.receive() }
+        return withTimeoutOrNull(1500) { healthChannel.receive() }
             ?.let { Healthy(currentTimeMillis() - time) }
             ?: NotHealthy
     }
