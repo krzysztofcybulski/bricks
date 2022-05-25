@@ -36,7 +36,7 @@ class Server(
             }
             .registry(Guice.registry { registry ->
                 registry
-//                    .module(MetricsConfiguration.dropwizardMetricsModule())
+                    .module(MetricsConfiguration.dropwizardMetricsModule())
                     .bindInstance(ClientErrorHandler::class.java, ErrorHandler())
                     .bindInstance(ServerErrorHandler::class.java, ErrorHandler())
             })
