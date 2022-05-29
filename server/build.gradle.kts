@@ -43,6 +43,7 @@ dependencies {
 
 application {
     mainClass.set("me.kcybulski.bricks.server.StartKt")
+    applicationDefaultJvmArgs = listOf("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }
 
 tasks.withType<Test> {

@@ -43,7 +43,6 @@ class LobbiesListReadModel private constructor(
     }
 
     private fun onPlayerJoinedToLobby(event: PlayerJoinedToLobby) {
-        val player = Player(event.player.name, Avatars.generateForPlayer(event.player))
         memory[event.lobbyId.raw.toString()]
             ?.let { it.copy(playersCount = it.playersCount + 1) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
