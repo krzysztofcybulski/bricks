@@ -8,7 +8,6 @@ import me.kcybulski.bricks.lobbies.LobbyStartedTournament
 import me.kcybulski.bricks.lobbies.PlayerJoinedToLobby
 import me.kcybulski.bricks.lobbies.PlayerLeftLobby
 import me.kcybulski.bricks.server.views.Avatars
-import me.kcybulski.bricks.server.views.lobbies.LobbyView.Player
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.CLOSED
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.IN_GAME
 import me.kcybulski.bricks.server.views.lobbies.LobbyView.Status.OPEN
@@ -107,10 +106,4 @@ data class LobbyView(
         OPEN, IN_GAME, CLOSED
 
     }
-
-    data class Player(
-        val name: String,
-        val avatarUrl: String
-    )
-
 }

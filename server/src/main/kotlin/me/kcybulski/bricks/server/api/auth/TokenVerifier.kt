@@ -14,5 +14,6 @@ object NotVerified : VerificationResult()
 
 data class Verified(
     val id: String,
-    val name: String
+    val name: String,
+    val avatar: String
 ) : VerificationResult()

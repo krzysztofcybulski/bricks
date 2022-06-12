@@ -1,5 +1,6 @@
 package me.kcybulski.bricks.server.views.lobbies
 
+import me.kcybulski.bricks.api.Identity
 import me.kcybulski.bricks.events.EventBus
 import me.kcybulski.bricks.game.GameEndedEvent
 import me.kcybulski.bricks.game.GameStartedEvent
@@ -18,11 +19,14 @@ import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsView.Player
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsView.Status.CLOSED
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsView.Status.IN_GAME
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsView.Status.OPEN
+import me.kcybulski.bricks.server.views.users.UserViewsReadModel
 import me.kcybulski.bricks.tournament.GameEndedInTournament
 import me.kcybulski.bricks.tournament.TournamentEnded
 import java.util.UUID
 
-class LobbyDetailsReadModel private constructor() {
+class LobbyDetailsReadModel private constructor(
+    private val users: UserViewsReadModel
+) {
 
     private val gamesMemory: MutableMap<String, Game> = mutableMapOf()
     private val memory: MutableMap<String, LobbyDetailsView> = mutableMapOf()
@@ -46,11 +50,16 @@ class LobbyDetailsReadModel private constructor() {
     }
 
     private fun onPlayerJoinedToLobby(event: PlayerJoinedToLobby) {
-        val player = Player(event.player.name, Avatars.generateForPlayer(event.player), 0)
+        val player = users.find(event.player.name)
+            ?.let { Player(it.name, it.avatarUrl, 0) }
+            ?: defaultPlayer(event.player)
         memory[event.lobbyId.raw.toString()]
             ?.let { it.copy(players = it.players + player) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
+
+    private fun defaultPlayer(player: Identity) =
+        Player(player.name, Avatars.generateForPlayer(player), 0)
 
     private fun onPlayerLeftLobby(event: PlayerLeftLobby) {
         memory[event.lobbyId.raw.toString()]
@@ -89,10 +98,12 @@ class LobbyDetailsReadModel private constructor() {
 
     private fun onGameEnded(event: GameEndedEvent) {
         gamesMemory[event.gameId.toString()]
-            ?.copy(winner = when(event.result) {
-                TieResult -> "-"
-                is GameWonResult -> (event.result as GameWonResult).player.name
-            })
+            ?.copy(
+                winner = when (event.result) {
+                    TieResult -> "-"
+                    is GameWonResult -> (event.result as GameWonResult).player.name
+                }
+            )
             ?.let { gamesMemory[event.gameId.toString()] = it }
     }
 
@@ -110,8 +121,8 @@ class LobbyDetailsReadModel private constructor() {
 
     companion object {
 
-        fun configureInMemory(eventBus: EventBus): LobbyDetailsReadModel {
-            val lobbiesViews = LobbyDetailsReadModel()
+        fun configureInMemory(eventBus: EventBus, users: UserViewsReadModel): LobbyDetailsReadModel {
+            val lobbiesViews = LobbyDetailsReadModel(users)
 
             eventBus.subscribe(LobbyAdded::class, lobbiesViews::onLobbyAdded)
             eventBus.subscribe(LobbyDeleted::class, lobbiesViews::onLobbyDeleted)

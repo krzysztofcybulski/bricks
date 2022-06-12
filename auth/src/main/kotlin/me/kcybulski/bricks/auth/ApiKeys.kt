@@ -1,14 +1,18 @@
 package me.kcybulski.bricks.auth
 
+import me.kcybulski.bricks.events.EventBus
+
 
 class ApiKeys internal constructor(
     private val generator: UUIDKeyGenerator,
-    private val repository: KeysRepository
+    private val repository: KeysRepository,
+    private val eventBus: EventBus
 ) {
 
     fun generateKey(user: ApiUser): ApiKey {
         val key = generator.generateKey()
         repository.saveKey(user, key.raw)
+        eventBus.send(UserRegistered(user), user.id)
         return key
     }
 
@@ -21,15 +25,24 @@ class ApiKeys internal constructor(
 
     companion object {
 
-        fun inMemoryNoHashing() = ApiKeys(
+        fun inMemoryNoHashing(eventBus: EventBus) = ApiKeys(
             generator = UUIDKeyGenerator,
-            repository = InMemoryKeysRepository()
+            repository = InMemoryKeysRepository(),
+            eventBus = eventBus
         )
 
     }
 
 }
 
-data class ApiUser(val id: String, val name: String)
+data class UserRegistered(
+    val apiUser: ApiUser
+)
+
+data class ApiUser(
+    val id: String,
+    val name: String,
+    val avatar: String
+)
 
 data class ApiKey(val raw: String)

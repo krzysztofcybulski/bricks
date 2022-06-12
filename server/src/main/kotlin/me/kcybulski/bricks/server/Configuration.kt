@@ -22,6 +22,7 @@ import me.kcybulski.bricks.server.healthcheck.RefreshLobbies
 import me.kcybulski.bricks.server.views.gamehistory.GamesHistoryReadModel
 import me.kcybulski.bricks.server.views.lobbies.LobbiesListReadModel
 import me.kcybulski.bricks.server.views.lobbies.LobbyDetailsReadModel
+import me.kcybulski.bricks.server.views.users.UserViewsReadModel
 import me.kcybulski.bricks.tournament.TournamentsModule
 import me.kcybulski.nexum.eventstore.EventStore
 import me.kcybulski.nexum.eventstore.inmemory.InMemoryEventStore
@@ -54,11 +55,12 @@ data class Configuration internal constructor(
                     { eventBus, commandBus, _ -> LobbiesModule.configureInMemory(eventBus, commandBus, lobbyNameGenerator) },
                     { eventBus, _, _ -> RefreshLobbies.configure(eventBus) },
                     { _, commandBus, modules -> Healthchecker.configure(websocketsRegistry, modules[RefreshLobbies::class], commandBus) },
+                    { eventBus, _, _ -> UserViewsReadModel.configureInMemory(eventBus) },
                     { eventBus, _, _ -> LobbiesListReadModel.configureInMemory(eventBus) },
-                    { eventBus, _, _ -> LobbyDetailsReadModel.configureInMemory(eventBus) },
-                    { eventBus, _, _ -> GamesHistoryReadModel.configureInMemory(eventBus) },
+                    { eventBus, _, modules -> LobbyDetailsReadModel.configureInMemory(eventBus, modules[UserViewsReadModel::class]) },
+                    { eventBus, _, modules -> GamesHistoryReadModel.configureInMemory(eventBus, modules[UserViewsReadModel::class]) },
                     { _, _, _ -> Bots.allBots(botNameGenerator) },
-                    { _, _, _ -> ApiKeys.inMemoryNoHashing() }
+                    { eventBus, _, _ -> ApiKeys.inMemoryNoHashing(eventBus) }
                 )
             )
 

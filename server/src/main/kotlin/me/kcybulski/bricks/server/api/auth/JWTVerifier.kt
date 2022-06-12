@@ -7,10 +7,13 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.google.common.net.HttpHeaders.AUTHORIZATION
+import me.kcybulski.bricks.api.Identity
+import me.kcybulski.bricks.server.views.Avatars
 import ratpack.handling.Context
 import java.security.interfaces.RSAPublicKey
 
 private const val NICKNAME_CLAIM = "https://bricks.kcybulski.me/nickname"
+private const val PICTURE_CLAIM = "https://bricks.kcybulski.me/picture"
 
 class JWTVerifier(
     domain: String,
@@ -36,7 +39,11 @@ class JWTVerifier(
     private fun verify(token: String): VerificationResult =
         try {
             val jwt: DecodedJWT = verifier.verify(token)
-            Verified(jwt.subject, jwt.claims[NICKNAME_CLAIM]?.asString() ?: jwt.subject)
+            Verified(
+                id = jwt.subject,
+                name = jwt.claims[NICKNAME_CLAIM]?.asString() ?: jwt.subject,
+                avatar = jwt.claims[PICTURE_CLAIM]?.asString() ?: Avatars.generateForPlayer(Identity(jwt.subject))
+            )
         } catch (exception: JWTVerificationException) {
             NotVerified
         }
