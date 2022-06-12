@@ -56,7 +56,7 @@ class LobbyDetailsReadModel private constructor(
     }
 
     private fun defaultPlayer(player: Identity) =
-        Player(player.name, Avatars.generateForPlayer(player), 0)
+        Player(player.name, player.name, Avatars.generateForPlayer(player), 0)
 
     private fun onPlayerLeftLobby(event: PlayerLeftLobby) {
         memory[event.lobbyId.raw.toString()]
@@ -114,7 +114,7 @@ class LobbyDetailsReadModel private constructor(
     }
 
     private fun findUser(identity: Identity) = users.find(identity.name)
-        ?.let { Player(it.name, it.avatarUrl, 0) }
+        ?.let { Player(it.id, it.name, it.avatarUrl, 0) }
         ?: defaultPlayer(identity)
 
     companion object {
@@ -156,6 +156,7 @@ data class LobbyDetailsView(
     }
 
     data class Player(
+        val id: String,
         val name: String,
         val avatarUrl: String,
         val points: Int

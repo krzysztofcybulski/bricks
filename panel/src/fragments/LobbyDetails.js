@@ -47,7 +47,7 @@ export default connect(
         loading: lobbies.loadingLobby,
         lobby: lobbies.selected && {
             ...lobbies.selected,
-            players: lobbies.selected.players.map(p => ({ ...p, ...players[p.name] }))
+            players: lobbies.selected.players.map(p => ({ ...p, ...players[p.id] }))
         },
         bots: lobbies?.allBots
     }),
