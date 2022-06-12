@@ -50,11 +50,8 @@ class LobbyDetailsReadModel private constructor(
     }
 
     private fun onPlayerJoinedToLobby(event: PlayerJoinedToLobby) {
-        val player = users.find(event.player.name)
-            ?.let { Player(it.name, it.avatarUrl, 0) }
-            ?: defaultPlayer(event.player)
         memory[event.lobbyId.raw.toString()]
-            ?.let { it.copy(players = it.players + player) }
+            ?.let { it.copy(players = it.players + findUser(event.player)) }
             ?.let { memory[event.lobbyId.raw.toString()] = it }
     }
 
@@ -88,10 +85,7 @@ class LobbyDetailsReadModel private constructor(
     private fun onGameStarted(event: GameStartedEvent) {
         gamesMemory[event.gameId.toString()] = Game(
             id = event.gameId,
-            players = listOf(
-                Player(event.players.first.name, Avatars.generateForPlayer(event.players.first), 0),
-                Player(event.players.second.name, Avatars.generateForPlayer(event.players.second), 0)
-            ),
+            players = listOf(findUser(event.players.first), findUser(event.players.second)),
             winner = null
         )
     }
@@ -118,6 +112,10 @@ class LobbyDetailsReadModel private constructor(
             }
             ?.let { memory[event.tournamentId.toString()] = it }
     }
+
+    private fun findUser(identity: Identity) = users.find(identity.name)
+        ?.let { Player(it.name, it.avatarUrl, 0) }
+        ?: defaultPlayer(identity)
 
     companion object {
 
