@@ -17,7 +17,7 @@ class UserViewsReadModel private constructor(
                 id = user.id,
                 name = user.name,
                 avatarUrl = user.avatar,
-                color = Avatars.color(user.id)
+                color = "#${Avatars.color(user.id)}"
             )
         )
     }

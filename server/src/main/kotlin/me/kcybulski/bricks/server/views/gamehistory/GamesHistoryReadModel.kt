@@ -9,7 +9,6 @@ import me.kcybulski.bricks.game.PlayerMovedEvent
 import me.kcybulski.bricks.game.TieResult
 import me.kcybulski.bricks.server.views.Avatars
 import me.kcybulski.bricks.server.views.users.UserViewsReadModel
-import me.kcybulski.bricks.server.views.users.UsersRepository
 import java.time.Clock
 import java.util.UUID
 
@@ -72,7 +71,7 @@ class GamesHistoryReadModel private constructor(
             ?: PlayerView(
                 name = identity.name,
                 image = Avatars.generateForPlayer(identity),
-                color = Avatars.color(identity.name)
+                color = "#${Avatars.color(identity.name)}"
             )
 
     companion object {
