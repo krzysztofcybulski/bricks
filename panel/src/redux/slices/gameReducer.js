@@ -35,11 +35,11 @@ const gamesSlice = createSlice({
                     players: {
                         first: {
                             ...payload.players.first,
-                            winner: payload.winner === payload.players.first.name
+                            winner: payload.winner === payload.players.first.id
                         },
                         second: {
                             ...payload.players.second,
-                            winner: payload.winner === payload.players.second.name
+                            winner: payload.winner === payload.players.second.id
                         }
                     },
                     blocks: [
