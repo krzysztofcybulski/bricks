@@ -63,12 +63,14 @@ class GamesHistoryReadModel private constructor(
         users.find(identity.name)
             ?.let {
                 PlayerView(
+                    id = it.id,
                     name = it.name,
                     image = it.avatarUrl,
                     color = it.color
                 )
             }
             ?: PlayerView(
+                id = identity.name,
                 name = identity.name,
                 image = Avatars.generateForPlayer(identity),
                 color = "#${Avatars.color(identity.name)}"

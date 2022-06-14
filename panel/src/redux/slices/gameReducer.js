@@ -26,8 +26,8 @@ const gamesSlice = createSlice({
                 state.game = payload;
 
                 const playerColors = ({
-                    [payload.players.first.name]: payload.players.first.color,
-                    [payload.players.second.name]: payload.players.second.color
+                    [payload.players.first.id]: payload.players.first.color,
+                    [payload.players.second.id]: payload.players.second.color
                 });
 
                 state.gameView = ({
@@ -45,7 +45,7 @@ const gamesSlice = createSlice({
                     blocks: [
                         ...payload.initialBlocks.map(({ x, y }) => ({ x, y, move: 0, player: "-", color: '#242424' })),
                         ...state.game.moves.flatMap(({ player, brick }, move) =>
-                            brick.blocks.map(({ x, y }) => ({ x, y, move: move + 1, player, color: `#${playerColors[player]}` }))
+                            brick.blocks.map(({ x, y }) => ({ x, y, move: move + 1, player, color: playerColors[player] }))
                         )
                     ],
                     maxTime: payload.moves.length,

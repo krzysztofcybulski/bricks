@@ -7,7 +7,7 @@ import Copy from './Copy';
 const AvatarHeader = ({ image, text }) =>
     <VerticalBox gap="medium" pad="medium" align="center" flex={{ shrink: 0}}>
         <Avatar url={image} size="large" />
-        <Copy><Header>{text}</Header></Copy>
+        <Header><Copy>{text}</Copy></Header>
     </VerticalBox>;
 
 export default AvatarHeader;

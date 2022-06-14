@@ -21,6 +21,7 @@ data class MoveInGameView(
 )
 
 data class PlayerView(
+    val id: String,
     val name: String,
     val image: String,
     val color: String
