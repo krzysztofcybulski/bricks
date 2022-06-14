@@ -13,7 +13,6 @@ import ratpack.guice.Guice
 import ratpack.handling.Chain
 import ratpack.handling.Context
 import ratpack.jackson.Jackson.json
-import ratpack.registry.Registry
 import ratpack.server.RatpackServer
 
 class Server(
@@ -32,7 +31,7 @@ class Server(
                 config
                     .env()
                     .port(port ?: 5050)
-                    .threads(1)
+                    .threads(4)
             }
             .registry(Guice.registry { registry ->
                 registry
