@@ -24,7 +24,7 @@ const Player = ({ player: { image, color, winner } }) =>
                 </Box>
             }
         </Stack>
-        <Box background={{ color }} height='small'/>
+        <Box background={color} height='16px'/>
     </VerticalBox>;
 
 export default GameHeader;
