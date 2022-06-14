@@ -106,7 +106,7 @@ class LobbyDetailsReadModel private constructor(
             ?.let { lobby ->
                 lobby.copy(
                     players = lobby.players.map { player ->
-                        player.copy(points = lobby.games.count { it.winner == player.name })
+                        player.copy(points = lobby.games.count { it.winner == player.id })
                     }
                 )
             }
