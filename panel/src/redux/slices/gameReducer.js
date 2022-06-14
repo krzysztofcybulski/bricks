@@ -45,7 +45,7 @@ const gamesSlice = createSlice({
                     blocks: [
                         ...payload.initialBlocks.map(({ x, y }) => ({ x, y, move: 0, player: "-", color: '#242424' })),
                         ...state.game.moves.flatMap(({ player, brick }, move) =>
-                            brick.blocks.map(({ x, y }) => ({ x, y, move: move + 1, player, color: playerColors[player] }))
+                            brick.blocks.map(({ x, y }) => ({ x, y, move: move + 1, player, color: `#${playerColors[player]}` }))
                         )
                     ],
                     maxTime: payload.moves.length,
